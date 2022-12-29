@@ -1,12 +1,12 @@
 #include "contr.h"
 #include "mem.h"
+#include "mmu.h"
 #include "exec.h"
 #include "rel.h"
 #include "term.h"
 #include "es.h"
 #include "so.h"
 #include "tela.h"
-#include "instr.h"
 #include "instr.h"
 
 #include <stdlib.h>
@@ -18,6 +18,7 @@
 
 struct contr_t {
   mem_t *mem;
+  mmu_t *mmu;
   exec_t *exec;
   rel_t *rel;
   term_t *term;
@@ -29,12 +30,14 @@ struct contr_t {
 static void contr_atualiza_estado(contr_t *self);
 
 
-contr_t *contr_cria(void) {
+contr_t *contr_cria(void)
+{
   contr_t *self = malloc(sizeof(*self));
   if (self == NULL) return NULL;
-  // Cria a memória
-  self->mem = mem_cria(MEM_TAM); 
-  // Cria dispositivos de E/S (o relógio e um terminal)
+  // cria a memória e a MMU
+  self->mem = mem_cria(MEM_TAM);
+  self->mmu = mmu_cria(self->mem);
+  // cria dispositivos de E/S (o relógio e um terminal)
   self->term = term_cria();
   self->rel = rel_cria(50);
   t_inicio();
@@ -47,7 +50,7 @@ contr_t *contr_cria(void) {
   es_registra_dispositivo(self->es, 2, self->rel, 0, rel_le, NULL, NULL);
   es_registra_dispositivo(self->es, 3, self->rel, 1, rel_le, NULL, NULL);
   // cria a unidade de execução e inicializa com a memória e E/S
-  self->exec = exec_cria(self->mem, self->es);
+  self->exec = exec_cria(self->mmu, self->es);
   self->so = NULL;
   return self;
 }
@@ -81,13 +84,18 @@ mem_t *contr_mem(contr_t *self)
   return self->mem;
 }
 
+mmu_t *contr_mmu(contr_t *self)
+{
+  return self->mmu;
+}
+
 exec_t *contr_exec(contr_t *self)
 {
   return self->exec;
 }
 
 es_t *contr_es(contr_t *self)
-{  
+{
   return self->es;
 }
 
