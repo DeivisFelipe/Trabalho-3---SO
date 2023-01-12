@@ -7,7 +7,7 @@
 #include <ctype.h>
 
 // fila de números
-#define FN_TAM 9  // quantos números cabem numa fila
+#define FN_TAM 5  // quantos números cabem numa fila
 typedef struct {
   int num[FN_TAM]; // os números
   int n;           // quantos números válidos tem
@@ -35,7 +35,8 @@ void fn_ins(fila_de_numeros *f, int n) // insere n na fila f
 int fn_rem(fila_de_numeros *f)    // remove (e retorna) o próximo da fila
 {
   if (f->n <= 0) return 0;
-  int r = f->num[--f->n];
+  int r = f->num[0];
+  --f->n;
   memmove(&(f->num[0]), &(f->num[1]), f->n * sizeof(int));
   return r;
 }
@@ -294,7 +295,7 @@ static void desenha_console(void)
 {
   attron(COLOR_PAIR(3));
   for (int l=0; l<N_LIN_CONS; l++) {
-    int y = 23 - N_LIN_CONS + l;
+    int y = 50 - N_LIN_CONS + l;
     mvprintw(y, 0, "%-*s", N_COL, tela.txt_console[l]);
   }
   attroff(COLOR_PAIR(3));
@@ -303,9 +304,9 @@ static void desenha_console(void)
 static void desenha_entrada(void)
 {
   attron(COLOR_PAIR(4));
-  mvprintw(23, 0, "%*s", N_COL, 
+  mvprintw(50, 0, "%*s", N_COL, 
            "P=para C=continua S=passo Lt=lê Zt=zera Etn=entra");
-  mvprintw(23, 0, "%s", tela.digitando);
+  mvprintw(50, 0, "%s", tela.digitando);
   attroff(COLOR_PAIR(4));
 }
 

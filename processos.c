@@ -3,12 +3,8 @@
 #include "mem.h"
 #include "es.h"
 #include "tela.h"
-#include "tab_pag.h"
 #include <stdlib.h>
 #include <stdbool.h>
-
-int tamanho_pagina = 5;
-int numero_de_paginas = 7;
 
 // Estrutura base de um processo
 struct processo_t {
@@ -36,7 +32,7 @@ struct processo_t {
 };
 
 // Função que cria o primeiro processo da lista de processos
-processo_t* processos_cria(int id, estado_t estado , mem_t *mem, int inicio_memoria, int fim_memoria, cpu_estado_t *cpu, int tempo_inicio){
+processo_t* processos_cria(int id, estado_t estado , mem_t *mem, int inicio_memoria, int fim_memoria, cpu_estado_t *cpu, int tempo_inicio, int tamanho_pagina, int numero_de_paginas){
   processo_t *self = malloc(sizeof(*self));
   self->id = id;
   self->estado = estado;
@@ -64,7 +60,7 @@ processo_t* processos_cria(int id, estado_t estado , mem_t *mem, int inicio_memo
 }
 
 // Função que insere um novo processo a lista de processos
-processo_t *processos_insere(processo_t *lista, int id, estado_t estado, int inicio_memoria, int fim_memoria, cpu_estado_t *cpu, int tempo_inicio, int quantum){
+processo_t *processos_insere(processo_t *lista, int id, estado_t estado, int inicio_memoria, int fim_memoria, cpu_estado_t *cpu, int tempo_inicio, int quantum, int tamanho_pagina, int numero_de_paginas){
   processo_t *novo = malloc(sizeof(*novo));
   novo->id = id;
   novo->estado = estado;
@@ -109,8 +105,8 @@ void processos_printa(processo_t *lista){
 }
 
 // Retorna a tabela de paginação do processo atual
-tab_pag_t processos_tabela_de_pag(processo_t *self){
-  return *self->tab_pag;
+tab_pag_t* processos_tabela_de_pag(processo_t *self){
+  return self->tab_pag;
 }
 
 // Remove um processo

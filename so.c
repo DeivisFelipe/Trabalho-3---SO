@@ -10,7 +10,8 @@
 
 #define QUANTUM 60
 #define TIPO_ESCALONADOR 2
-#define TAMANHO_QUADRO
+#define TAMANHO_QUADRO 5
+#define TAMANHI_PAGINA 5
 
 struct historico_t{
   int id;
@@ -63,7 +64,9 @@ so_t *so_cria(contr_t *contr)
   self->cpue = cpue_cria();
   self->memoria_utilizada = 0;
   init_mem(self); // Executa antes para saber qual o tamanho do programa principal
-  self->processos = processos_cria(0, EXECUCAO, contr_mem(self->contr), 0, self->memoria_utilizada, self->cpue, rel_agora(contr_rel(self->contr)));
+  t_printf("Memoria utilizada: %d", self->memoria_utilizada);
+  // Calcula o numero de paginas 
+  self->processos = processos_cria(0, EXECUCAO, contr_mem(self->contr), 0, self->memoria_utilizada, self->cpue, rel_agora(contr_rel(self->contr)), TAMANHI_PAGINA,10);
   processos_set_quantum(self->processos, QUANTUM);
   self->numero_de_processos = 1;
   self->memoria_pos = 0;
@@ -72,7 +75,8 @@ so_t *so_cria(contr_t *contr)
   self->tempo_parado = 0;
   self->chamadas_de_sistema = 0;
   self->chamadas_de_sistema_relogio = 0;
-  tav
+  tab_pag_t *tab = processos_tabela_de_pag(self->processos);
+  tab = tab;
 
   // historico
   self->historico = NULL;
@@ -420,7 +424,7 @@ static void so_trata_sisop_cria(so_t *self) {
     mem_muda_fim_executando(mem, self->memoria_pos_fim);
 
     //mem_printa(mem);
-    self->processos = processos_insere(self->processos, numeroPrograma, EXECUCAO, self->memoria_utilizada, fim, self->cpue, rel_agora(contr_rel(self->contr)), QUANTUM);
+    self->processos = processos_insere(self->processos, numeroPrograma, EXECUCAO, self->memoria_utilizada, fim, self->cpue, rel_agora(contr_rel(self->contr)), QUANTUM, TAMANHI_PAGINA, 10);
     
     self->memoria_utilizada += tamanhoMemoria;
     mem_muda_utilizado(mem, self->memoria_utilizada);

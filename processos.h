@@ -4,6 +4,7 @@
 #include "mem.h"
 #include "es.h"
 #include "cpu_estado.h"
+#include "tab_pag.h"
 #include <stdbool.h>
 
 typedef enum {
@@ -15,7 +16,7 @@ typedef enum {
 typedef struct processo_t processo_t;
 typedef struct historico_t historico_t;
 
-processo_t* processos_cria(int id, estado_t estado , mem_t *mem, int inicio_memoria, int fim_memoria, cpu_estado_t *cpu, int tempo_inicio);
+processo_t* processos_cria(int id, estado_t estado , mem_t *mem, int inicio_memoria, int fim_memoria, cpu_estado_t *cpu, int tempo_inicio, int tamanho_pagina, int numero_de_paginas);
 
 // Destroi todos os processos
 void processos_destroi(processo_t *lista);
@@ -24,13 +25,13 @@ void processos_destroi(processo_t *lista);
 void processos_desbloqueia(processo_t *lista, es_t *estrada_saida);
 
 // Insere um novo processo no final da fila
-processo_t *processos_insere(processo_t *lista, int id, estado_t estado, int inicio_memoria, int fim_memoria, cpu_estado_t *cpu, int tempo_inicio, int quantum);
+processo_t *processos_insere(processo_t *lista, int id, estado_t estado, int inicio_memoria, int fim_memoria, cpu_estado_t *cpu, int tempo_inicio, int quantum, int tamanho_pagina, int numero_de_paginas);
 
 // Funcao que printa todos os processos
 void processos_printa(processo_t *lista);
 
 // Retorna a tabela de paginação do processo atual
-tab_pag_t processos_tabela_de_pag(processo_t *self);
+tab_pag_t *processos_tabela_de_pag(processo_t *self);
 
 // Remove um processo
 void processos_remove(processo_t *lista, processo_t *atual);
