@@ -3,8 +3,12 @@
 #include "mem.h"
 #include "es.h"
 #include "tela.h"
+#include "tab_pag.h"
 #include <stdlib.h>
 #include <stdbool.h>
+
+int tamanho_pagina = 5;
+int numero_de_paginas = 7;
 
 // Estrutura base de um processo
 struct processo_t {
@@ -14,8 +18,10 @@ struct processo_t {
     int terminal_bloqueio;
     cpu_estado_t *cpue;
     processo_t *proximo;
+    // Memoria
     int inicio_memoria;
     int fim_memoria;
+    tab_pag_t *tab_pag;
     // Estatisticas
     int tempo_em_execucao;
     int tempo_em_bloqueio;
@@ -49,6 +55,8 @@ processo_t* processos_cria(int id, estado_t estado , mem_t *mem, int inicio_memo
   self->tempo_inicio = tempo_inicio;
   self->numero_preempcoes = 0;
   self->quantum = 0;
+  self->tab_pag = tab_pag_cria(numero_de_paginas, tamanho_pagina);
+
 
   cpue_copia(cpu, self->cpue);
   //mem_printa(mem, inicio_memoria, fim_memoria);
@@ -75,6 +83,8 @@ processo_t *processos_insere(processo_t *lista, int id, estado_t estado, int ini
   novo->tempo_inicio = tempo_inicio;
   novo->numero_preempcoes = 0;
   novo->quantum = quantum;
+  novo->tab_pag = tab_pag_cria(numero_de_paginas, tamanho_pagina);
+
 
   cpue_copia(cpu, novo->cpue);
   if(lista->proximo == NULL){
@@ -96,6 +106,11 @@ void processos_printa(processo_t *lista){
     t_printf("ID: %d, Estado: %d, Inicio: %d, Fim: %d, Bloqueio: %d, Tipo: %d", temp->id, temp->estado, temp->inicio_memoria, temp->fim_memoria, temp->terminal_bloqueio, temp->tipo_bloqueio);
     temp = temp->proximo;
   }
+}
+
+// Retorna a tabela de paginação do processo atual
+tab_pag_t processos_tabela_de_pag(processo_t *self){
+  return *self->tab_pag;
 }
 
 // Remove um processo

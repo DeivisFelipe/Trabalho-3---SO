@@ -29,6 +29,9 @@ processo_t *processos_insere(processo_t *lista, int id, estado_t estado, int ini
 // Funcao que printa todos os processos
 void processos_printa(processo_t *lista);
 
+// Retorna a tabela de paginação do processo atual
+tab_pag_t processos_tabela_de_pag(processo_t *self);
+
 // Remove um processo
 void processos_remove(processo_t *lista, processo_t *atual);
 
