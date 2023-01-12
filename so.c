@@ -1,5 +1,6 @@
 #include "so.h"
 #include "tela.h"
+#include "tab_pag.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -9,6 +10,7 @@
 
 #define QUANTUM 60
 #define TIPO_ESCALONADOR 2
+#define TAMANHO_QUADRO
 
 struct historico_t{
   int id;
@@ -70,6 +72,7 @@ so_t *so_cria(contr_t *contr)
   self->tempo_parado = 0;
   self->chamadas_de_sistema = 0;
   self->chamadas_de_sistema_relogio = 0;
+  tav
 
   // historico
   self->historico = NULL;

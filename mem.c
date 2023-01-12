@@ -96,7 +96,8 @@ static err_t verif_permissao(mem_t *self, int endereco)
 err_t mem_le(mem_t *self, int endereco, int *pvalor)
 {
   // Pega o PC e soma com o valor inicial da memoria do programa
-  endereco = self->inicio_executando + endereco;
+  //endereco = self->inicio_executando + endereco;
+  endereco = endereco;
   err_t err = verif_permissao(self, endereco);
   if (err == ERR_OK) {
     *pvalor = self->conteudo[endereco];
@@ -106,7 +107,8 @@ err_t mem_le(mem_t *self, int endereco, int *pvalor)
 
 err_t mem_escreve(mem_t *self, int endereco, int valor)
 {
-  endereco = self->inicio_executando + endereco;
+  //endereco = self->inicio_executando + endereco;
+  endereco = endereco;
   //t_printf("endereco =  %d\n", endereco);
   //t_printf("valor =  %d\n", valor);
   err_t err = verif_permissao(self, endereco);
