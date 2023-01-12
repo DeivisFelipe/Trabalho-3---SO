@@ -281,7 +281,7 @@ static void so_termina(so_t *self)
 }
 
 // Divide a string pelo delimitador, retornando um array de strings
-char** divide_string(char* a_str, const char a_delim, int *tamanhoMemoria){
+char** divide_string(char* a_str, const char a_delim, int *tamanho_memoria){
     char** result    = 0;
     size_t count     = 0;
     char* tmp        = a_str;
@@ -299,7 +299,7 @@ char** divide_string(char* a_str, const char a_delim, int *tamanhoMemoria){
         tmp++;
     }
 
-    *tamanhoMemoria = *tamanhoMemoria + count;
+    *tamanho_memoria = *tamanho_memoria + count;
 
     /* Adiciona espaço para token à direita. */
     count += last_comma < (a_str + strlen(a_str) - 1);
@@ -361,7 +361,7 @@ static void so_trata_sisop_cria(so_t *self) {
   int numeroPrograma = cpue_A(self->cpue);
   char p[1] = "p";
   char programa[7];
-  int tamanhoMemoria = 0;
+  int tamanho_memoria = 0;
   // Leitura dos comandos do programa
   snprintf (programa, 7, "%s%d.maq", p, numeroPrograma);
   
@@ -379,7 +379,7 @@ static void so_trata_sisop_cria(so_t *self) {
   char *result;
   int pos = 0;
   int *valores;
-  valores = malloc(tamanhoMemoria * sizeof(int));
+  valores = malloc(tamanho_memoria * sizeof(int));
   while (!feof(pont_arq)) {
     result = fgets(Linha, 100, pont_arq); 
     if (result){
@@ -389,8 +389,8 @@ static void so_trata_sisop_cria(so_t *self) {
       memcpy(parte, &Linha[posicao], final);
 
       char** tokens;
-      tokens = divide_string(parte, ',', &tamanhoMemoria);
-      valores = realloc(valores, tamanhoMemoria * sizeof(int));
+      tokens = divide_string(parte, ',', &tamanho_memoria);
+      valores = realloc(valores, tamanho_memoria * sizeof(int));
 
       if (tokens) {
         int i;
@@ -410,7 +410,7 @@ static void so_trata_sisop_cria(so_t *self) {
   }
 
   // Salva qual vai ser a pos final do processo novo
-  int fim = self->memoria_utilizada + tamanhoMemoria;
+  int fim = self->memoria_utilizada + tamanho_memoria;
 
   // Salva o processo atual e bloqueia ele
   processos_atualiza_dados_processo(atual, BLOQUEADO, self->cpue);
@@ -429,17 +429,56 @@ static void so_trata_sisop_cria(so_t *self) {
   // Aumenta o número de processos
   self->numero_de_processos++;
 
+  // Pega a mmu
+  mmu_t *mmu = contr_mmu(self->contr);
+
   // Verifica se o processo já existe na lista de processos, neste caso só reinicia a cpu e pega as posições da memoria
   if(!processos_existe(self->processos, numeroPrograma)){
     self->memoria_pos = self->memoria_utilizada;
     self->memoria_pos_fim = fim;
-    mem_muda_inicio_executando(mem, self->memoria_pos);
-    mem_muda_fim_executando(mem, self->memoria_pos_fim);
+
+    // Não precisa mais no t3
+    // Muda o inicio e o fim da memoria que vai ser executado
+    //mem_muda_inicio_executando(mem, self->memoria_pos);
+    //mem_muda_fim_executando(mem, self->memoria_pos_fim);
+
+    // Calcula numero de paginas e quadro inicial
+    int numero_de_paginas = tamanho_memoria / TAMANHO_PAGINA;
+    if(tamanho_memoria % TAMANHO_PAGINA != 0){
+      numero_de_paginas++;
+    }
 
     //mem_printa(mem);
-    self->processos = processos_insere(self->processos, numeroPrograma, EXECUCAO, self->memoria_utilizada, fim, self->cpue, rel_agora(contr_rel(self->contr)), QUANTUM, TAMANHO_PAGINA, 10);
+    self->processos = processos_insere(self->processos, numeroPrograma, EXECUCAO, self->memoria_utilizada, fim, self->cpue, rel_agora(contr_rel(self->contr)), QUANTUM, TAMANHO_PAGINA, numero_de_paginas);
+
+    // Pega o processo que está sendo executado
+    processo_t *processo = processos_pega_execucao(self->processos);
+
+    // Modifica as páginas
+    tab_pag_t *tab = processos_tabela_de_pag(processo);
+
+    // Pega o quadro inicial
+    int quadro_inicial = self->memoria_utilizada / TAMANHO_PAGINA;
+    if(self->memoria_utilizada % TAMANHO_PAGINA != 0){
+      quadro_inicial++;
+    }
+    quadro_inicial++;
+
+    // Preenche a tabela de páginas
+    t_printf("Quadro inicial: %d", quadro_inicial);
+    for(int i = 0; i < numero_de_paginas; i++){
+      tab_pag_muda_quadro(tab, i, quadro_inicial + i);
+      tab_pag_muda_valida(tab, i, true);
+      tab_pag_muda_acessada(tab, i, false);
+      tab_pag_muda_alterada(tab, i, false);
+    }
+
+    // Muda a tabela de páginas da MMU
+    tab_pag_imprime(tab);
+    mmu_usa_tab_pag(mmu, tab);
     
-    self->memoria_utilizada += tamanhoMemoria;
+    self->memoria_utilizada += tamanho_memoria;
+    t_printf("Memoria utilizada: %d\n", self->memoria_utilizada);
     mem_muda_utilizado(mem, self->memoria_utilizada);
   }else{
     t_printf("O processo já existe, reiniciando a cpu e pegando as posições da memoria\n");
@@ -457,18 +496,25 @@ static void so_trata_sisop_cria(so_t *self) {
     // printa a posição inicial e final da memoria
     t_printf("Posição inicial da memoria: %d\n", inicio);
     t_printf("Posição final da memoria: %d\n", fim);
+
+    // Muda a tabela de paginas da MMU
+    tab_pag_t *tab = processos_tabela_de_pag(processo);
+    mmu_usa_tab_pag(mmu, tab);
+
+    // não vai mais ser usado no t3
     // Muda as posições da memoria para o SO e para a memoria
-    self->memoria_pos = inicio;
-    self->memoria_pos_fim = fim;
-    mem_muda_inicio_executando(mem, self->memoria_pos);
-    mem_muda_fim_executando(mem, self->memoria_pos_fim);
+    // self->memoria_pos = inicio;
+    // self->memoria_pos_fim = fim;
+    // mem_muda_inicio_executando(mem, self->memoria_pos);
+    // mem_muda_fim_executando(mem, self->memoria_pos_fim);
   }
 
   // Insere o código do novo programa na memoria
-  for (int i = 0; i < self->memoria_pos_fim-self->memoria_pos; i++) {
-    if (mem_escreve(mem, i, valores[i]) != ERR_OK) {
+  for (int i = 0; i < tamanho_memoria; i++) {
+    if (mmu_escreve(mmu, i, valores[i]) != ERR_OK) {
       t_printf("so.init_mem: erro de memoria, endereco %d\n", i);
       panico(self);
+      break;
     }
   }
 
@@ -577,10 +623,10 @@ void escalonador(so_t *self){
   // t_printf("ini %d, fim %d", inicio, fim);
   
   // Muda as posições da memoria para o SO e para a memoria
-  self->memoria_pos = inicio;
-  self->memoria_pos_fim = fim;
-  mem_muda_inicio_executando(mem, self->memoria_pos);
-  mem_muda_fim_executando(mem, self->memoria_pos_fim);
+  // self->memoria_pos = inicio;
+  // self->memoria_pos_fim = fim;
+  // mem_muda_inicio_executando(mem, self->memoria_pos);
+  // mem_muda_fim_executando(mem, self->memoria_pos_fim);
 
   //mem_printa(mem);
 

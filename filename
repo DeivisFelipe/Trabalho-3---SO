@@ -1,6 +1,102 @@
-==286== Memcheck, a memory error detector
-==286== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
-==286== Using Valgrind-3.15.0 and LibVEX; rerun with -h for copyright info
-==286== Command: ./teste
-==286== Parent PID: 10
-==286== 
+==389== Memcheck, a memory error detector
+==389== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==389== Using Valgrind-3.15.0 and LibVEX; rerun with -h for copyright info
+==389== Command: ./teste
+==389== Parent PID: 10
+==389== 
+==389== Conditional jump or move depends on uninitialised value(s)
+==389==    at 0x10C45A: instr_nome (instr.c:57)
+==389==    by 0x10DED3: str_estado (contr.c:146)
+==389==    by 0x10E0AF: contr_atualiza_estado (contr.c:175)
+==389==    by 0x10DDBD: contr_laco (contr.c:113)
+==389==    by 0x10A68C: main (teste.c:12)
+==389==  Uninitialised value was created by a heap allocation
+==389==    at 0x483B7F3: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==389==    by 0x10BE89: mem_cria (mem.c:21)
+==389==    by 0x10DA45: contr_cria (contr.c:38)
+==389==    by 0x10A659: main (teste.c:9)
+==389== 
+==389== Conditional jump or move depends on uninitialised value(s)
+==389==    at 0x4923958: __vfprintf_internal (vfprintf-internal.c:1687)
+==389==    by 0x49310F8: __vsprintf_internal (iovsprintf.c:95)
+==389==    by 0x490DEC7: sprintf (sprintf.c:30)
+==389==    by 0x10DF1D: str_estado (contr.c:146)
+==389==    by 0x10E0AF: contr_atualiza_estado (contr.c:175)
+==389==    by 0x10DDBD: contr_laco (contr.c:113)
+==389==    by 0x10A68C: main (teste.c:12)
+==389==  Uninitialised value was created by a heap allocation
+==389==    at 0x483B7F3: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==389==    by 0x10BE89: mem_cria (mem.c:21)
+==389==    by 0x10DA45: contr_cria (contr.c:38)
+==389==    by 0x10A659: main (teste.c:9)
+==389== 
+==389== Use of uninitialised value of size 8
+==389==    at 0x490769B: _itoa_word (_itoa.c:179)
+==389==    by 0x4923574: __vfprintf_internal (vfprintf-internal.c:1687)
+==389==    by 0x49310F8: __vsprintf_internal (iovsprintf.c:95)
+==389==    by 0x490DEC7: sprintf (sprintf.c:30)
+==389==    by 0x10DF1D: str_estado (contr.c:146)
+==389==    by 0x10E0AF: contr_atualiza_estado (contr.c:175)
+==389==    by 0x10DDBD: contr_laco (contr.c:113)
+==389==    by 0x10A68C: main (teste.c:12)
+==389==  Uninitialised value was created by a heap allocation
+==389==    at 0x483B7F3: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==389==    by 0x10BE89: mem_cria (mem.c:21)
+==389==    by 0x10DA45: contr_cria (contr.c:38)
+==389==    by 0x10A659: main (teste.c:9)
+==389== 
+==389== Conditional jump or move depends on uninitialised value(s)
+==389==    at 0x49076AD: _itoa_word (_itoa.c:179)
+==389==    by 0x4923574: __vfprintf_internal (vfprintf-internal.c:1687)
+==389==    by 0x49310F8: __vsprintf_internal (iovsprintf.c:95)
+==389==    by 0x490DEC7: sprintf (sprintf.c:30)
+==389==    by 0x10DF1D: str_estado (contr.c:146)
+==389==    by 0x10E0AF: contr_atualiza_estado (contr.c:175)
+==389==    by 0x10DDBD: contr_laco (contr.c:113)
+==389==    by 0x10A68C: main (teste.c:12)
+==389==  Uninitialised value was created by a heap allocation
+==389==    at 0x483B7F3: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==389==    by 0x10BE89: mem_cria (mem.c:21)
+==389==    by 0x10DA45: contr_cria (contr.c:38)
+==389==    by 0x10A659: main (teste.c:9)
+==389== 
+==389== Conditional jump or move depends on uninitialised value(s)
+==389==    at 0x4924228: __vfprintf_internal (vfprintf-internal.c:1687)
+==389==    by 0x49310F8: __vsprintf_internal (iovsprintf.c:95)
+==389==    by 0x490DEC7: sprintf (sprintf.c:30)
+==389==    by 0x10DF1D: str_estado (contr.c:146)
+==389==    by 0x10E0AF: contr_atualiza_estado (contr.c:175)
+==389==    by 0x10DDBD: contr_laco (contr.c:113)
+==389==    by 0x10A68C: main (teste.c:12)
+==389==  Uninitialised value was created by a heap allocation
+==389==    at 0x483B7F3: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==389==    by 0x10BE89: mem_cria (mem.c:21)
+==389==    by 0x10DA45: contr_cria (contr.c:38)
+==389==    by 0x10A659: main (teste.c:9)
+==389== 
+==389== Conditional jump or move depends on uninitialised value(s)
+==389==    at 0x49236EE: __vfprintf_internal (vfprintf-internal.c:1687)
+==389==    by 0x49310F8: __vsprintf_internal (iovsprintf.c:95)
+==389==    by 0x490DEC7: sprintf (sprintf.c:30)
+==389==    by 0x10DF1D: str_estado (contr.c:146)
+==389==    by 0x10E0AF: contr_atualiza_estado (contr.c:175)
+==389==    by 0x10DDBD: contr_laco (contr.c:113)
+==389==    by 0x10A68C: main (teste.c:12)
+==389==  Uninitialised value was created by a heap allocation
+==389==    at 0x483B7F3: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==389==    by 0x10BE89: mem_cria (mem.c:21)
+==389==    by 0x10DA45: contr_cria (contr.c:38)
+==389==    by 0x10A659: main (teste.c:9)
+==389== 
+==389== Conditional jump or move depends on uninitialised value(s)
+==389==    at 0x10C4B5: instr_num_args (instr.c:67)
+==389==    by 0x10DF2B: str_estado (contr.c:150)
+==389==    by 0x10E0AF: contr_atualiza_estado (contr.c:175)
+==389==    by 0x10DDBD: contr_laco (contr.c:113)
+==389==    by 0x10A68C: main (teste.c:12)
+==389==  Uninitialised value was created by a heap allocation
+==389==    at 0x483B7F3: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+==389==    by 0x10BE89: mem_cria (mem.c:21)
+==389==    by 0x10DA45: contr_cria (contr.c:38)
+==389==    by 0x10A659: main (teste.c:9)
+==389== 

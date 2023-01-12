@@ -87,7 +87,7 @@ void mem_muda_utilizado(mem_t *self, int utilizado){
 // função auxiliar, verifica se endereço é válido
 static err_t verif_permissao(mem_t *self, int endereco)
 {
-  if (endereco < 0 || endereco >= self->tam || endereco < self->inicio_executando || endereco >= self->fim_executando) {
+  if (endereco < 0 || endereco >= self->tam/* || endereco < self->inicio_executando || endereco >= self->fim_executando */) {
     return ERR_END_INV;
   }
   return ERR_OK;
