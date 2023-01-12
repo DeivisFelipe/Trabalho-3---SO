@@ -11,7 +11,7 @@
 #define QUANTUM 60
 #define TIPO_ESCALONADOR 2
 #define TAMANHO_QUADRO 5
-#define TAMANHI_PAGINA 5
+#define TAMANHO_PAGINA 5
 
 struct historico_t{
   int id;
@@ -66,7 +66,12 @@ so_t *so_cria(contr_t *contr)
   init_mem(self); // Executa antes para saber qual o tamanho do programa principal
   t_printf("Memoria utilizada: %d", self->memoria_utilizada);
   // Calcula o numero de paginas 
-  self->processos = processos_cria(0, EXECUCAO, contr_mem(self->contr), 0, self->memoria_utilizada, self->cpue, rel_agora(contr_rel(self->contr)), TAMANHI_PAGINA,10);
+  int numero_de_paginas = self->memoria_utilizada / TAMANHO_PAGINA;
+  if(self->memoria_utilizada % TAMANHO_PAGINA != 0){
+    numero_de_paginas++;
+  }
+  t_printf("Numero de paginas: %d", numero_de_paginas);
+  self->processos = processos_cria(0, EXECUCAO, contr_mem(self->contr), 0, self->memoria_utilizada, self->cpue, rel_agora(contr_rel(self->contr)), TAMANHO_PAGINA, numero_de_paginas);
   processos_set_quantum(self->processos, QUANTUM);
   self->numero_de_processos = 1;
   self->memoria_pos = 0;
@@ -76,7 +81,15 @@ so_t *so_cria(contr_t *contr)
   self->chamadas_de_sistema = 0;
   self->chamadas_de_sistema_relogio = 0;
   tab_pag_t *tab = processos_tabela_de_pag(self->processos);
-  tab = tab;
+  for(int i = 0; i < numero_de_paginas; i++){
+    tab_pag_muda_quadro(tab, i, i);
+    tab_pag_muda_valida(tab, i, true);
+    tab_pag_muda_acessada(tab, i, false);
+    tab_pag_muda_alterada(tab, i, false);
+  }
+  tab_pag_imprime(tab);
+  mmu_t *mmu = contr_mmu(self->contr);
+  mmu_usa_tab_pag(mmu, tab);
 
   // historico
   self->historico = NULL;
@@ -424,7 +437,7 @@ static void so_trata_sisop_cria(so_t *self) {
     mem_muda_fim_executando(mem, self->memoria_pos_fim);
 
     //mem_printa(mem);
-    self->processos = processos_insere(self->processos, numeroPrograma, EXECUCAO, self->memoria_utilizada, fim, self->cpue, rel_agora(contr_rel(self->contr)), QUANTUM, TAMANHI_PAGINA, 10);
+    self->processos = processos_insere(self->processos, numeroPrograma, EXECUCAO, self->memoria_utilizada, fim, self->cpue, rel_agora(contr_rel(self->contr)), QUANTUM, TAMANHO_PAGINA, 10);
     
     self->memoria_utilizada += tamanhoMemoria;
     mem_muda_utilizado(mem, self->memoria_utilizada);

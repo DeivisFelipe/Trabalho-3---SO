@@ -1,4 +1,5 @@
 #include "tab_pag.h"
+#include "tela.h"
 #include <stdlib.h>
 #include <stdbool.h>
 
@@ -76,6 +77,14 @@ bool tab_pag_acessada(tab_pag_t *self, int pag)
 bool tab_pag_alterada(tab_pag_t *self, int pag)
 {
   return self->tab[pag].alterada;
+}
+
+void tab_pag_imprime(tab_pag_t *self){
+  t_printf("Tabela de Páginas");
+  t_printf("Página\tValida\tQuadro\tAcessada\tAlterada");
+  for(int i = 0; i < self->num_pag; i++){
+    t_printf("%d\t%d\t%d\t%d\t\t%d", i, self->tab[i].valida, self->tab[i].quadro, self->tab[i].acessada, self->tab[i].alterada);
+  }
 }
 
 

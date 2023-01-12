@@ -32,6 +32,7 @@ bool tab_pag_valida(tab_pag_t *self, int pag);
 int tab_pag_quadro(tab_pag_t *self, int pag);
 bool tab_pag_acessada(tab_pag_t *self, int pag);
 bool tab_pag_alterada(tab_pag_t *self, int pag);
+void tab_pag_imprime(tab_pag_t *self);
 
 // altera informação sobre uma página da tabela
 void tab_pag_muda_valida(tab_pag_t *self, int pag, bool val);
