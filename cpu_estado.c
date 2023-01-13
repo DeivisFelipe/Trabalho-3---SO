@@ -1,4 +1,5 @@
 #include "cpu_estado.h"
+#include "tela.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -95,5 +96,5 @@ void cpue_muda_modo(cpu_estado_t *self, cpu_modo_t modo)
 
 void cpue_imprime(cpu_estado_t *self)
 {
-  printf("PC = %d, A = %d, X = %d, modo = %d, erro = %d, complemento = %d", self->PC, self->A, self->X, self->modo, self->erro, self->complemento);
+  t_printf("PC = %d, A = %d, X = %d, modo = %d, erro = %d, complemento = %d", self->PC, self->A, self->X, self->modo, self->erro, self->complemento);
 }

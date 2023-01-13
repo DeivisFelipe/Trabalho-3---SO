@@ -251,6 +251,8 @@ static void so_trata_sisop_fim(so_t *self)
 
   processos_remove(self->processos, atual);
   self->numero_de_processos--;
+  t_printf("Número de processos: %i", self->numero_de_processos);
+  processos_imprime(self->processos);
 
   // Finaliza o programa para o teste de tempo de execução
   if(self->numero_de_processos == 1){
@@ -434,14 +436,13 @@ static void so_trata_sisop_cria(so_t *self) {
   // Pega a memoria do controlador
   mem_t *mem = contr_mem(self->contr);
 
-  // Aumenta o número de processos
-  self->numero_de_processos++;
-
   // Pega a mmu
   mmu_t *mmu = contr_mmu(self->contr);
 
   // Verifica se o processo já existe na lista de processos, neste caso só reinicia a cpu e pega as posições da memoria
   if(!processos_existe(self->processos, numeroPrograma)){
+    // Aumenta o número de processos
+    self->numero_de_processos++;
     self->memoria_pos = self->memoria_utilizada;
     self->memoria_pos_fim = fim;
 
@@ -520,13 +521,6 @@ static void so_trata_sisop_cria(so_t *self) {
       break;
     }
   }
-
-  cpue_imprime(self->cpue);
-  tab_pag_t *tab = processos_tabela_de_pag(processos_pega_execucao(self->processos));
-  tab_pag_imprime(tab);
-  processos_imprime(self->processos);
-
-  //mem_printa(mem);
 
   // Libera a memoria
   free(valores);
