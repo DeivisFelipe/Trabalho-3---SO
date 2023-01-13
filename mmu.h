@@ -13,6 +13,9 @@
 // tipo opaco que representa o gerenciador de memória
 typedef struct mmu_t mmu_t;
 
+// tipo opaco que representa um quadro
+typedef struct quadro_t quadro_t;
+
 // cria um gerenciador de memória para gerenciar acessos à memória
 //   representada por 'mem'
 // deve receber uma tabela de páginas para poder realizar a conversão

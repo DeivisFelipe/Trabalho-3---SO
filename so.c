@@ -82,7 +82,7 @@ so_t *so_cria(contr_t *contr)
   tab_pag_t *tab = processos_tabela_de_pag(self->processos);
   for(int i = 0; i < numero_de_paginas; i++){
     tab_pag_muda_quadro(tab, i, i);
-    tab_pag_muda_valida(tab, i, true);
+    tab_pag_muda_valida(tab, i, false);
     tab_pag_muda_acessada(tab, i, false);
     tab_pag_muda_alterada(tab, i, false);
   }
@@ -687,6 +687,12 @@ void so_int(so_t *self, err_t err)
       // Computada a quantidade de chamadas de sistema do relógio
       self->chamadas_de_sistema_relogio++;
       so_trata_tic(self);
+      break;
+    case ERR_PAGINV:
+      t_printf("SO: ERR_PAGINV pagina invalida\n");
+      break;
+    case ERR_FALPAG:
+      t_printf("SO: ERR_FALPAG Tabela diz que a página é inválida\n");
       break;
     default:
       t_printf("SO: interrupcao nao tratada [%s]", err_nome(err));

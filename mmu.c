@@ -7,7 +7,20 @@ struct mmu_t {
   mem_t *mem;          // a memória física
   tab_pag_t *tab_pag;  // a tabela de páginas
   int ultimo_endereco; // o último endereço virtual traduzido pela MMU
+  // Controle de quadros
+  quadro_t *quadros_livres;
+  quadro_t *quadros_ocupados;
 };
+
+struct quadro_t {
+  int id;
+  int endereco_principal_inicio;
+  int endereco_principal_fim;
+  int endereco_secundario_inicio;
+  int endereco_secundario_fim;
+  quadro_t *proxmo;
+};
+
 
 mmu_t *mmu_cria(mem_t *mem)
 {
@@ -16,8 +29,41 @@ mmu_t *mmu_cria(mem_t *mem)
   if (self != NULL) {
     self->mem = mem;
     self->tab_pag = NULL;
+    self->quadros_ocupados = NULL;
+    self->quadros_livres = NULL;
   }
   return self;
+}
+
+void mmu_insere_quadro_livre(mmu_t *self, int id, int endereco_principal_inicio, int endereco_principal_fim, int endereco_secundario_inicio, int endereco_secundario_fim) {
+  quadro_t *quadro = malloc(sizeof(*quadro));
+  quadro->id = id;
+  quadro->endereco_principal_inicio = endereco_principal_inicio;
+  quadro->endereco_principal_fim = endereco_principal_fim;
+  quadro->endereco_secundario_inicio = endereco_secundario_inicio;
+  quadro->endereco_secundario_fim = endereco_secundario_fim;
+  quadro->proxmo = self->quadros_livres;
+  self->quadros_livres = quadro;
+}
+
+void mmu_insere_quadro_ocupado(mmu_t *self, int id, int endereco_principal_inicio, int endereco_principal_fim, int endereco_secundario_inicio, int endereco_secundario_fim) {
+  quadro_t *quadro = malloc(sizeof(*quadro));
+  quadro->id = id;
+  quadro->endereco_principal_inicio = endereco_principal_inicio;
+  quadro->endereco_principal_fim = endereco_principal_fim;
+  quadro->endereco_secundario_inicio = endereco_secundario_inicio;
+  quadro->endereco_secundario_fim = endereco_secundario_fim;
+  quadro->proxmo = self->quadros_ocupados;
+  self->quadros_ocupados = quadro;
+}
+
+void mmu_inicia_quadros_livres(mmu_t *self, int tamanho_quadro) {
+  int tamanha_memoria = mem_tam(self->mem);
+  int numero_quadros = tamanha_memoria / tamanho_quadro;
+  int i;
+  for (i = 0; i < numero_quadros; i++) {
+    mmu_insere_quadro_livre(self, i, i * tamanho_quadro, (i + 1) * tamanho_quadro - 1, i * tamanho_quadro, (i + 1) * tamanho_quadro - 1);
+  }
 }
 
 void mmu_destroi(mmu_t *self)
