@@ -68,6 +68,12 @@ int tab_pag_quadro(tab_pag_t *self, int pag)
   return self->tab[pag].quadro;
 }
 
+// retorna o numero de páginas da tabela
+int tab_pag_num_pag(tab_pag_t *self)
+{
+  return self->num_pag;
+}
+
 
 bool tab_pag_acessada(tab_pag_t *self, int pag)
 {
@@ -83,8 +89,13 @@ bool tab_pag_alterada(tab_pag_t *self, int pag)
 void tab_pag_imprime(tab_pag_t *self){
   t_printf("Tabela de Páginas");
   t_printf("Página\tValida\tQuadro\tAcessada\tAlterada");
+  t_printf("numero %d", self->num_pag);
+  t_atualiza();
   for(int i = 0; i < self->num_pag; i++){
+    //t_printf("%d", i);
+    //t_atualiza();
     t_printf("%d\t%d\t%d\t%d\t\t%d", i, self->tab[i].valida, self->tab[i].quadro, self->tab[i].acessada, self->tab[i].alterada);
+    //t_atualiza();
   }
 }
 

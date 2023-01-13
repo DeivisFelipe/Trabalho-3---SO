@@ -1,6 +1,8 @@
 #ifndef SO_H
 #define SO_H
 
+#include "cpu_estado.h"
+
 // SO
 // Simula o sistema operacional
 // É chamado na inicialização (quando deve colocar um programa na memória), e

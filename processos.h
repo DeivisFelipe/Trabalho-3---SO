@@ -21,6 +21,9 @@ processo_t* processos_cria(int id, estado_t estado , mem_t *mem, int inicio_memo
 // Destroi todos os processos
 void processos_destroi(processo_t *lista);
 
+// Imprime os processos
+void processos_imprime(processo_t *lista);
+
 // Verifica desbloqueio de processo
 void processos_desbloqueia(processo_t *lista, es_t *estrada_saida);
 

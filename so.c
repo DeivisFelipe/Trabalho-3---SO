@@ -86,13 +86,11 @@ so_t *so_cria(contr_t *contr)
     tab_pag_muda_acessada(tab, i, false);
     tab_pag_muda_alterada(tab, i, false);
   }
-  tab_pag_imprime(tab);
   mmu_t *mmu = contr_mmu(self->contr);
   mmu_usa_tab_pag(mmu, tab);
 
   // Atualiza a memoria utilizada considerando os quadros utilizados
   self->memoria_utilizada = numero_de_paginas * TAMANHO_QUADRO;
-  t_printf("Memoria utilizada: %d", self->memoria_utilizada);
 
   // historico
   self->historico = NULL;
@@ -259,6 +257,13 @@ static void so_trata_sisop_fim(so_t *self)
     t_printf("Finalizando SO");
     t_ins(7, 0);
   }
+
+  
+
+  // Deixa a mmu sem tabela de páginas
+  mmu_t *mmu = contr_mmu(self->contr);
+  mmu_usa_tab_pag(mmu, NULL);
+
   escalonador(self);
 }
 
@@ -450,7 +455,6 @@ static void so_trata_sisop_cria(so_t *self) {
     if(tamanho_memoria % TAMANHO_PAGINA != 0){
       numero_de_paginas++;
     }
-    t_printf("Tamanho programa: %d", tamanho_memoria);
 
     //mem_printa(mem);
     self->processos = processos_insere(self->processos, numeroPrograma, EXECUCAO, self->memoria_utilizada, fim, self->cpue, rel_agora(contr_rel(self->contr)), QUANTUM, TAMANHO_PAGINA, numero_de_paginas);
@@ -465,7 +469,6 @@ static void so_trata_sisop_cria(so_t *self) {
     int quadro_inicial = self->memoria_utilizada / TAMANHO_PAGINA;
 
     // Preenche a tabela de páginas
-    t_printf("Quadro inicial: %d", quadro_inicial);
     for(int i = 0; i < numero_de_paginas; i++){
       tab_pag_muda_quadro(tab, i, quadro_inicial + i);
       tab_pag_muda_valida(tab, i, true);
@@ -474,12 +477,11 @@ static void so_trata_sisop_cria(so_t *self) {
     }
 
     // Muda a tabela de páginas da MMU
-    tab_pag_imprime(tab);
     mmu_usa_tab_pag(mmu, tab);
     
     // Mudança do utilizado considerando a quantidade de quadros
     self->memoria_utilizada += numero_de_paginas * TAMANHO_PAGINA;
-    t_printf("Memoria utilizada: %d\n", self->memoria_utilizada);
+    //t_printf("Memoria utilizada: %d\n", self->memoria_utilizada);
     mem_muda_utilizado(mem, self->memoria_utilizada);
   }else{
     t_printf("O processo já existe, reiniciando a cpu e pegando as posições da memoria\n");
@@ -518,6 +520,11 @@ static void so_trata_sisop_cria(so_t *self) {
       break;
     }
   }
+
+  cpue_imprime(self->cpue);
+  tab_pag_t *tab = processos_tabela_de_pag(processos_pega_execucao(self->processos));
+  tab_pag_imprime(tab);
+  processos_imprime(self->processos);
 
   //mem_printa(mem);
 
@@ -593,7 +600,9 @@ void escalonador(so_t *self){
     cpue_copia(processos_pega_cpue(pronto), self->cpue);
   }else{
     // Não encontrou nenhum processo, ou seja, chama o SO para executar
-    t_printf("Processo: SO executando\n");
+    if(!self->paniquei){
+      t_printf("Processo: SO executando\n");
+    }
 
     pronto = self->processos; // Pega o processo do SO
 
@@ -615,9 +624,10 @@ void escalonador(so_t *self){
 
   // Pega a mmu
   mmu_t *mmu = contr_mmu(self->contr);
-  
-  // Atualiza a tabela de paginas da mmu
+
   tab_pag_t *tab = processos_tabela_de_pag(pronto);
+
+  // Atualiza a tabela de paginas da mmu
   mmu_usa_tab_pag(mmu, tab);
 
 
@@ -628,18 +638,12 @@ void escalonador(so_t *self){
   //int inicio = processos_pega_inicio(pronto);
   // Posição final da memoria
   //int fim = processos_pega_fim(pronto);
-
-  // t_printf("ini %d, fim %d", inicio, fim);
   
   // Muda as posições da memoria para o SO e para a memoria
   // self->memoria_pos = inicio;
   // self->memoria_pos_fim = fim;
   // mem_muda_inicio_executando(mem, self->memoria_pos);
   // mem_muda_fim_executando(mem, self->memoria_pos_fim);
-
-  //mem_printa(mem);
-
-  //t_printf("a: %d, x: %i, Pc: %d\n", cpue_A(estado),cpue_X(estado),cpue_PC(estado));
 }
 
 // houve uma interrupção do tipo err — trate-a
@@ -706,10 +710,11 @@ void so_contabiliza_instrucoes(so_t *self){
 void funcao_teste(so_t * self){
   t_ins(7, 1);
   t_ins(7, 2);
-  //t_ins(0, 80);
-  t_ins(0, 1);
-  //t_ins(1, 60);
-  t_ins(1, 1);
+  t_ins(7, 1);
+  t_ins(0, 20);
+  //t_ins(0, 10);
+  t_ins(1, 2);
+  //t_ins(1, 10);
 }
 
 // Função utilizada para limpar os terminais

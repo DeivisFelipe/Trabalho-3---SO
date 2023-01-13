@@ -27,6 +27,9 @@ void tab_pag_destroi(tab_pag_t *self);
 //   ERR_PAGINV a tabela não contém a página
 err_t tab_pag_traduz(tab_pag_t *self, int end_v, int *end_f);
 
+// retorn o numero de páginas da tabela
+int tab_pag_num_pag(tab_pag_t *self);
+
 // obtém informação sobre uma página da tabela
 bool tab_pag_valida(tab_pag_t *self, int pag);
 int tab_pag_quadro(tab_pag_t *self, int pag);

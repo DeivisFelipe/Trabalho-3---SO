@@ -53,7 +53,6 @@ processo_t* processos_cria(int id, estado_t estado , mem_t *mem, int inicio_memo
   self->quantum = 0;
   self->tab_pag = tab_pag_cria(numero_de_paginas, tamanho_pagina);
 
-
   cpue_copia(cpu, self->cpue);
   //mem_printa(mem, inicio_memoria, fim_memoria);
   return self;
@@ -123,8 +122,7 @@ void processos_remove(processo_t *lista, processo_t *atual){
   }
   temp->proximo = atual->proximo;
   free(atual->cpue);
-  tab_pag_destroi(temp->tab_pag);
-  t_printf("estou aqui");
+  tab_pag_destroi(atual->tab_pag);
   free(atual);
 }
 
@@ -454,3 +452,13 @@ void processos_destroi(processo_t *lista){
   return;
 }
 
+// Imprime os processos
+void processos_imprime(processo_t *lista){
+  processo_t *temp = lista;
+  while (temp != NULL)
+  {
+    t_printf("ID: %d, Estado: %d, Inicio: %d, Fim: %d", temp->id, temp->estado, temp->inicio_memoria, temp->fim_memoria);
+    temp = temp->proximo;
+  }
+  return;
+}
