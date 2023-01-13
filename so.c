@@ -433,8 +433,11 @@ static void so_trata_sisop_cria(so_t *self) {
   cpue_muda_erro(self->cpue, ERR_OK, 0);
   cpue_muda_modo(self->cpue, supervisor);
 
-  // Pega a memoria do controlador
+  // Pega a memoria primaria do controlador
   mem_t *mem = contr_mem(self->contr, 0);
+
+  // Pega a memoria secundaria do controlador
+  mem_t *memSecundaria = contr_mem(self->contr, 1);
 
   // Pega a mmu
   mmu_t *mmu = contr_mmu(self->contr);
@@ -446,10 +449,9 @@ static void so_trata_sisop_cria(so_t *self) {
     self->memoria_pos = self->memoria_utilizada;
     self->memoria_pos_fim = fim;
 
-    // Não precisa mais no t3
-    // Muda o inicio e o fim da memoria que vai ser executado
-    //mem_muda_inicio_executando(mem, self->memoria_pos);
-    //mem_muda_fim_executando(mem, self->memoria_pos_fim);
+    // Muda o inicio e o fim da memoria secundaria que vai ser executado
+    mem_muda_inicio_executando(memSecundaria, self->memoria_pos);
+    mem_muda_fim_executando(memSecundaria, self->memoria_pos_fim);
 
     // Calcula numero de paginas e quadro inicial
     int numero_de_paginas = tamanho_memoria / TAMANHO_PAGINA;
@@ -484,6 +486,7 @@ static void so_trata_sisop_cria(so_t *self) {
     self->memoria_utilizada += numero_de_paginas * TAMANHO_PAGINA;
     //t_printf("Memoria utilizada: %d\n", self->memoria_utilizada);
     mem_muda_utilizado(mem, self->memoria_utilizada);
+    mem_muda_utilizado(memSecundaria, self->memoria_utilizada);
   }else{
     t_printf("O processo já existe, reiniciando a cpu e pegando as posições da memoria\n");
     // Pega o programa que já existe
@@ -507,20 +510,31 @@ static void so_trata_sisop_cria(so_t *self) {
 
     // não vai mais ser usado no t3
     // Muda as posições da memoria para o SO e para a memoria
-    // self->memoria_pos = inicio;
-    // self->memoria_pos_fim = fim;
-    // mem_muda_inicio_executando(mem, self->memoria_pos);
-    // mem_muda_fim_executando(mem, self->memoria_pos_fim);
+    self->memoria_pos = inicio;
+    self->memoria_pos_fim = fim;
+    mem_muda_inicio_executando(memSecundaria, self->memoria_pos);
+    mem_muda_fim_executando(memSecundaria, self->memoria_pos_fim);
   }
 
-  // Insere o código do novo programa na memoria
+  // Insere o código do novo programa na memoria principal
   for (int i = 0; i < tamanho_memoria; i++) {
     if (mmu_escreve(mmu, i, valores[i]) != ERR_OK) {
-      t_printf("so.init_mem: erro de memoria, endereco %d\n", i);
+      t_printf("so.init_mem: erro de memoria principal, endereco %d\n", i);
       panico(self);
       break;
     }
   }
+
+  // Insere o código do novo programa na memoria secundaria
+  for (int i = self->memoria_pos; i < self->memoria_pos_fim; i++) {
+    if (mem_escreve(memSecundaria, i, valores[i]) != ERR_OK) {
+      t_printf("so.init_mem: erro de memoria secundaria, endereco %d\n", i);
+      panico(self);
+      break;
+    }
+  }
+
+  mem_printa(memSecundaria);
 
   // Libera a memoria
   free(valores);
