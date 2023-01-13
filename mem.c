@@ -50,7 +50,7 @@ int mem_tam(mem_t *self)
 }
 
 // Printa a memoria de um parte
-void mem_printa(mem_t *self){
+void mem_printa(mem_t *self, mem_t *compara){
   int i;
   int pc;
   if(self->tipo == 0){
@@ -61,8 +61,14 @@ void mem_printa(mem_t *self){
   } else {
     t_printf("INICIO: %d", self->inicio_executando);
     t_printf("MEMORIA SECUNDARIA");
-    for (i = self->inicio_executando, pc = 0; i < self->fim_executando; i++, pc++){
-      t_printf("mem[%2d] = %4d - ins = %s", i, self->conteudo[i], instr_nome(self->conteudo[i]));
+    if(compara == NULL){
+      for (i = self->inicio_executando, pc = 0; i < self->fim_executando; i++, pc++){
+        t_printf("mem[%2d] = %4d - ins = %s", i, self->conteudo[i], instr_nome(self->conteudo[i]));
+      }
+    }else{
+      for (i = self->inicio_executando, pc = 0; i < self->fim_executando; i++, pc++){
+        t_printf("mem[%2d] = %4d - ins = %s \t# mem[%2d] = %4d - ins = %s ", i, self->conteudo[i], instr_nome(self->conteudo[i]), i, compara->conteudo[i], instr_nome(compara->conteudo[i]));
+      }
     }
     t_printf("INICIO: %d", self->inicio_executando);
     t_printf("FIM: %d", self->fim_executando);

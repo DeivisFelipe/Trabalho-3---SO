@@ -25,7 +25,7 @@ void mem_destroi(mem_t *self);
 int mem_tam(mem_t *self);
 
 // Printa todo o conteudo da memoria do processo rodando
-void mem_printa(mem_t *self);
+void mem_printa(mem_t *self, mem_t *compara);
 
 // Retorna o ponteiro do conteudo
 int *mem_conteudo(mem_t *self);
