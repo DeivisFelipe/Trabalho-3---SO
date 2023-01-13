@@ -92,3 +92,8 @@ void cpue_muda_modo(cpu_estado_t *self, cpu_modo_t modo)
 {
   self->modo = modo;
 }
+
+void cpue_imprime(cpu_estado_t *self)
+{
+  printf("PC = %d, A = %d, X = %d, modo = %d, erro = %d, complemento = %d", self->PC, self->A, self->X, self->modo, self->erro, self->complemento);
+}
