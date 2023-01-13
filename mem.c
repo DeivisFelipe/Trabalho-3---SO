@@ -61,7 +61,7 @@ void mem_printa(mem_t *self){
   } else {
     t_printf("INICIO: %d", self->inicio_executando);
     t_printf("MEMORIA SECUNDARIA");
-    for (i = 0/*self->inicio_executando*/, pc = 0; i < 35; i++, pc++){
+    for (i = self->inicio_executando, pc = 0; i < self->fim_executando; i++, pc++){
       t_printf("mem[%2d] = %4d - ins = %s", i, self->conteudo[i], instr_nome(self->conteudo[i]));
     }
     t_printf("INICIO: %d", self->inicio_executando);
