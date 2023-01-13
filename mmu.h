@@ -53,4 +53,22 @@ err_t mmu_escreve(mmu_t *self, int endereco, int valor);
 // função usada pelo SO para obter o endereço que causou falha de página
 int mmu_ultimo_endereco(mmu_t *self);
 
+
+// Gerenciamento de quadros
+
+// Pega um quadro livre
+quadro_t *mmu_retira_quadro_livre(mmu_t *self);
+
+// Pega um guardo ocupado
+quadro_t *mmu_retira_quadro_ocupado(mmu_t *self);
+
+// cria um quadro livre
+void mmu_insere_quadro_livre(mmu_t *self, int id, int endereco_principal_inicio, int endereco_principal_fim, int endereco_secundario_inicio, int endereco_secundario_fim);
+
+// cria um quadro ocupado
+void mmu_insere_quadro_ocupado(mmu_t *self, int id, int endereco_principal_inicio, int endereco_principal_fim, int endereco_secundario_inicio, int endereco_secundario_fim);
+
+// inicializa os quadros livres
+void mmu_inicia_quadros_livres(mmu_t *self, int tamanho_quadro);
+
 #endif // MMU_H

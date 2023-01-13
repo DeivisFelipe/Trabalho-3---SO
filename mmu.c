@@ -66,9 +66,47 @@ void mmu_inicia_quadros_livres(mmu_t *self, int tamanho_quadro) {
   }
 }
 
+void mmu_imprime_quadros_livres(mmu_t *self) {
+  quadro_t *quadro = self->quadros_livres;
+  while (quadro != NULL) {
+    printf("Quadro %d: %d - %d\n", quadro->id, quadro->endereco_principal_inicio, quadro->endereco_principal_fim);
+    quadro = quadro->proxmo;
+  }
+}
+
+void mmu_imprime_quadros_ocupados(mmu_t *self) {
+  quadro_t *quadro = self->quadros_ocupados;
+  while (quadro != NULL) {
+    printf("Quadro %d: %d - %d\n", quadro->id, quadro->endereco_principal_inicio, quadro->endereco_principal_fim);
+    quadro = quadro->proxmo;
+  }
+}
+
+void mmu_imprime_quadros(mmu_t *self) {
+  mmu_imprime_quadros_livres(self);
+  mmu_imprime_quadros_ocupados(self);
+}
+
+quadro_t *mmu_retira_quadro_livre(mmu_t *self) {
+  quadro_t *quadro = self->quadros_livres;
+  self->quadros_livres = quadro->proxmo;
+  return quadro;
+}
+
+quadro_t *mmu_retira_quadro_ocupado(mmu_t *self) {
+  quadro_t *quadro = self->quadros_ocupados;
+  self->quadros_ocupados = quadro->proxmo;
+  return quadro;
+}
+
 void mmu_destroi(mmu_t *self)
 {
   if (self != NULL) {
+    for(quadro_t *quadro = self->quadros_livres; quadro != NULL; ) {
+      quadro = quadro->proxmo;
+      quadro_t *aux = quadro;
+      free(aux);
+    }
     free(self);
   }
 }
