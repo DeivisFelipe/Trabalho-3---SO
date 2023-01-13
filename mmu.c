@@ -1,5 +1,6 @@
 #include "mmu.h"
 #include "tab_pag.h"
+#include "tela.h"
 #include <stdlib.h>
 
 // tipo de dados opaco para representar o controlador de memória
@@ -69,7 +70,7 @@ void mmu_inicia_quadros_livres(mmu_t *self, int tamanho_quadro) {
 void mmu_imprime_quadros_livres(mmu_t *self) {
   quadro_t *quadro = self->quadros_livres;
   while (quadro != NULL) {
-    printf("Quadro %d: %d - %d\n", quadro->id, quadro->endereco_principal_inicio, quadro->endereco_principal_fim);
+    t_printf("Quadro %d: %d - %d\n", quadro->id, quadro->endereco_principal_inicio, quadro->endereco_principal_fim);
     quadro = quadro->proxmo;
   }
 }
@@ -77,7 +78,7 @@ void mmu_imprime_quadros_livres(mmu_t *self) {
 void mmu_imprime_quadros_ocupados(mmu_t *self) {
   quadro_t *quadro = self->quadros_ocupados;
   while (quadro != NULL) {
-    printf("Quadro %d: %d - %d\n", quadro->id, quadro->endereco_principal_inicio, quadro->endereco_principal_fim);
+    t_printf("Quadro %d: %d - %d\n", quadro->id, quadro->endereco_principal_inicio, quadro->endereco_principal_fim);
     quadro = quadro->proxmo;
   }
 }

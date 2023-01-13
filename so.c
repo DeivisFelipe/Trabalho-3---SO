@@ -87,6 +87,9 @@ so_t *so_cria(contr_t *contr)
     tab_pag_muda_alterada(tab, i, false);
   }
   mmu_t *mmu = contr_mmu(self->contr);
+  mmu_inicia_quadros_livres(mmu, TAMANHO_QUADRO);
+  mmu_imprime_quadros_livres(mmu);
+  mmu_imprime_quadros_ocupados(mmu);
   mmu_usa_tab_pag(mmu, tab);
 
   // Atualiza a memoria utilizada considerando os quadros utilizados

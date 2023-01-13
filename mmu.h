@@ -62,6 +62,15 @@ quadro_t *mmu_retira_quadro_livre(mmu_t *self);
 // Pega um guardo ocupado
 quadro_t *mmu_retira_quadro_ocupado(mmu_t *self);
 
+// Imprime os quadros livres
+void mmu_imprime_quadros_livres(mmu_t *self);
+
+// Imprime os quadros ocupados
+void mmu_imprime_quadros_ocupados(mmu_t *self);
+
+// Imprime todos os quadros
+void mmu_imprime_quadros(mmu_t *self);
+
 // cria um quadro livre
 void mmu_insere_quadro_livre(mmu_t *self, int id, int endereco_principal_inicio, int endereco_principal_fim, int endereco_secundario_inicio, int endereco_secundario_fim);
 
