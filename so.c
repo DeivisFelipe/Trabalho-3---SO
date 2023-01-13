@@ -523,10 +523,7 @@ static void so_trata_sisop_cria(so_t *self) {
       panico(self);
       break;
     }
-  }
-
-  // Insere o código do novo programa na memoria secundaria
-  for (int i = self->memoria_pos; i < self->memoria_pos_fim; i++) {
+    // Insere o código do novo programa na memoria secundaria
     if (mem_escreve(memSecundaria, i, valores[i]) != ERR_OK) {
       t_printf("so.init_mem: erro de memoria secundaria, endereco %d\n", i);
       panico(self);
