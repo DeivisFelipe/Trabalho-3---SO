@@ -113,6 +113,23 @@ void so_destroi(so_t *self)
   free(self);
 }
 
+void salvaMemoriaSecundaria(so_t *self, processo_t *atual){
+  int fim =  self->memoria_pos_fim - self->memoria_pos;
+  int valor;
+  for(int i = 0; i < fim; i++){
+    err_t erro = mmu_le(contr_mmu(self->contr), i, &valor);
+    if(erro == ERR_OK){
+      err_t erro2 = mem_escreve(contr_mem(self->contr, 1), i, valor);
+      if(erro2 != ERR_OK){
+        t_printf("Erro ao escrever na memoria secundaria");
+      }
+    }else{
+      t_printf("Erro ao ler da memoria principal");
+    }
+  }
+  mem_printa(contr_mem(self->contr, 1), contr_mem(self->contr, 0));
+}
+
 // trata chamadas de sistema
 
 // chamada de sistema para leitura de E/S
@@ -130,6 +147,7 @@ static void so_trata_sisop_le(so_t *self)
   if(!pronto){
     processo_t *atual = processos_pega_execucao(self->processos);
     processos_atualiza_estado_processo(atual, BLOQUEADO, leitura, disp);
+    salvaMemoriaSecundaria(self, atual);
     if(processos_pega_id(atual) == 0){
       cpue_muda_modo(self->cpue, zumbi);
       cpue_muda_modo(processos_pega_cpue(atual), zumbi);
@@ -175,6 +193,7 @@ static void so_trata_sisop_escr(so_t *self)
   if(!pronto){
     processo_t *atual = processos_pega_execucao(self->processos);
     processos_atualiza_estado_processo(atual, BLOQUEADO, escrita, disp);
+    salvaMemoriaSecundaria(self, atual);
     if(processos_pega_id(atual) == 0){
       cpue_muda_modo(self->cpue, zumbi);
       cpue_muda_modo(processos_pega_cpue(atual), zumbi);
@@ -531,7 +550,7 @@ static void so_trata_sisop_cria(so_t *self) {
     }
   }
 
-  mem_printa(memSecundaria);
+  mem_printa(memSecundaria, NULL);
 
   // Libera a memoria
   free(valores);
@@ -806,7 +825,7 @@ static void init_mem(so_t *self)
   self->memoria_utilizada += tamanho_programa;
   mem_muda_utilizado(mem, self->memoria_utilizada);
   mem_muda_utilizado(memSecundaria, self->memoria_utilizada);
-  mem_printa(memSecundaria);
+  mem_printa(memSecundaria, NULL);
   //t_printf("Memoria Utilizada: %d\n", mem_utilizado(mem));
 }
   
