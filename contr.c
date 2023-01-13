@@ -36,7 +36,8 @@ contr_t *contr_cria(void)
   contr_t *self = malloc(sizeof(*self));
   if (self == NULL) return NULL;
   // cria a memória e a MMU
-  self->mem = mem_cria(MEM_TAM);
+  self->mem = mem_cria(MEM_TAM, 0);
+  self->memSecundaria = mem_cria(MEM_TAM, 1);
   self->mmu = mmu_cria(self->mem);
   // cria dispositivos de E/S (o relógio e um terminal)
   self->term = term_cria();
@@ -57,8 +58,8 @@ contr_t *contr_cria(void)
 }
 
 // Cria a memoria para o controlador
-mem_t *contr_cria_memoria(contr_t *self, int tamanho) {
-  self->mem = mem_cria(tamanho);
+mem_t *contr_cria_memoria(contr_t *self, int tamanho, int tipo) {
+  self->mem = mem_cria(tamanho, tipo);
   return self->mem;
 }
 
@@ -72,6 +73,7 @@ void contr_destroi(contr_t *self) {
   so_destroi(self->so);
   t_fim();
   mem_destroi(self->mem);
+  mem_destroi(self->memSecundaria);
   mmu_destroi(self->mmu);
   free(self);
 }
@@ -81,9 +83,12 @@ void contr_informa_so(contr_t *self, so_t *so) {
   self->so = so;
 }
 
-mem_t *contr_mem(contr_t *self)
-{
-  return self->mem;
+mem_t *contr_mem(contr_t *self, int tipo){
+  if (tipo == 0) {
+    return self->mem;
+  } else {
+    return self->memSecundaria;
+  }
 }
 
 mmu_t *contr_mmu(contr_t *self)

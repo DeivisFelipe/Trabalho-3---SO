@@ -28,8 +28,8 @@ void contr_laco(contr_t *self);
 void contr_informa_so(contr_t *self, so_t *so);
 
 // funções de acesso aos componentes do hardware
-mem_t *contr_cria_memoria(contr_t *self, int tamanho);
-mem_t *contr_mem(contr_t *self);
+mem_t *contr_cria_memoria(contr_t *self, int tamanho, int tipo);
+mem_t *contr_mem(contr_t *self, int tipo);
 mmu_t *contr_mmu(contr_t *self);
 exec_t *contr_exec(contr_t *self);
 es_t *contr_es(contr_t *self);

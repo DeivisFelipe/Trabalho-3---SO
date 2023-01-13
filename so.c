@@ -70,7 +70,7 @@ so_t *so_cria(contr_t *contr)
     numero_de_paginas++;
   }
   t_printf("Numero de paginas: %d", numero_de_paginas);
-  self->processos = processos_cria(0, EXECUCAO, contr_mem(self->contr), 0, self->memoria_utilizada, self->cpue, rel_agora(contr_rel(self->contr)), TAMANHO_PAGINA, numero_de_paginas);
+  self->processos = processos_cria(0, EXECUCAO, contr_mem(self->contr, 0), 0, self->memoria_utilizada, self->cpue, rel_agora(contr_rel(self->contr)), TAMANHO_PAGINA, numero_de_paginas);
   processos_set_quantum(self->processos, QUANTUM);
   self->numero_de_processos = 1;
   self->memoria_pos = 0;
@@ -434,7 +434,7 @@ static void so_trata_sisop_cria(so_t *self) {
   cpue_muda_modo(self->cpue, supervisor);
 
   // Pega a memoria do controlador
-  mem_t *mem = contr_mem(self->contr);
+  mem_t *mem = contr_mem(self->contr, 0);
 
   // Pega a mmu
   mmu_t *mmu = contr_mmu(self->contr);
@@ -765,7 +765,7 @@ static void init_mem(so_t *self)
   t_printf("Processo: SO executando\n");
 
   // inicializa a memória com o programa com uma memoria nova
-  mem_t *mem = contr_mem(self->contr);
+  mem_t *mem = contr_mem(self->contr, 0);
   mem_muda_utilizado(mem, self->memoria_utilizada);
   mem_muda_inicio_executando(mem, 0);
   mem_muda_fim_executando(mem, tamanho_programa);
