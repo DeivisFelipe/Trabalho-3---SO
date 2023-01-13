@@ -10,15 +10,16 @@ struct mem_t {
   int utilizado;
   int inicio_executando;
   int fim_executando;
+  int tipo; // 0 = memoria principal, 1 = memoria secundaria
 };
 
-mem_t *mem_cria(int tam)
-{
+mem_t *mem_cria(int tam, int tipo) {
   mem_t *self;
   self = malloc(sizeof(*self));
   if (self != NULL) {
     self->tam = tam;
     self->utilizado = 0;
+    self->tipo = tipo;
     self->conteudo = malloc(tam * sizeof(*(self->conteudo)));
     if (self->conteudo == NULL) {
       free(self);
@@ -52,12 +53,20 @@ int mem_tam(mem_t *self)
 void mem_printa(mem_t *self){
   int i;
   int pc;
-  t_printf("INICIO: %d", self->inicio_executando);
-  for (i = 0/*self->inicio_executando*/, pc = 0; i < 35; i++, pc++){
-    t_printf("mem[%2d] = %4d - ins = %s", i, self->conteudo[i], instr_nome(self->conteudo[i]));
+  if(self->tipo == 0){
+    t_printf("MEMORIA PRINCIPAL");
+    for (i = 0/*self->inicio_executando*/, pc = 0; i < 35; i++, pc++){
+      t_printf("mem[%2d] = %4d - ins = %s", i, self->conteudo[i], instr_nome(self->conteudo[i]));
+    }
+  } else {
+    t_printf("INICIO: %d", self->inicio_executando);
+    t_printf("MEMORIA SECUNDARIA");
+    for (i = 0/*self->inicio_executando*/, pc = 0; i < 35; i++, pc++){
+      t_printf("mem[%2d] = %4d - ins = %s", i, self->conteudo[i], instr_nome(self->conteudo[i]));
+    }
+    t_printf("INICIO: %d", self->inicio_executando);
+    t_printf("FIM: %d", self->fim_executando);
   }
-  t_printf("INICIO: %d", self->inicio_executando);
-  t_printf("FIM: %d", self->fim_executando);
 }
 
 // Muda o valor de inicio da memoria do programa do processo
@@ -97,8 +106,12 @@ static err_t verif_permissao(mem_t *self, int endereco)
 err_t mem_le(mem_t *self, int endereco, int *pvalor)
 {
   // Pega o PC e soma com o valor inicial da memoria do programa
-  //endereco = self->inicio_executando + endereco;
-  endereco = endereco;
+  if(self->tipo == 0){
+    endereco = endereco;
+  } else {
+    // mem_secundaria
+    endereco = self->inicio_executando + endereco;
+  }
   err_t err = verif_permissao(self, endereco);
   if (err == ERR_OK) {
     *pvalor = self->conteudo[endereco];
@@ -108,10 +121,12 @@ err_t mem_le(mem_t *self, int endereco, int *pvalor)
 
 err_t mem_escreve(mem_t *self, int endereco, int valor)
 {
-  //endereco = self->inicio_executando + endereco;
-  endereco = endereco;
-  //t_printf("endereco =  %d\n", endereco);
-  //t_printf("valor =  %d\n", valor);
+  if(self->tipo == 0){
+    endereco = endereco;
+  } else {
+    // mem_secundaria
+    endereco = self->inicio_executando + endereco;
+  }
   err_t err = verif_permissao(self, endereco);
   if (err == ERR_OK) {
     self->conteudo[endereco] = valor;

@@ -18,6 +18,7 @@
 
 struct contr_t {
   mem_t *mem;
+  mem_t *memSecundaria;
   mmu_t *mmu;
   exec_t *exec;
   rel_t *rel;
