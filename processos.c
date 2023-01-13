@@ -114,6 +114,7 @@ void processos_remove(processo_t *lista, processo_t *atual){
   processo_t *temp = lista;
   if(temp->proximo == NULL){
     free(temp->cpue);
+    tab_pag_destroi(temp->tab_pag);
     free(temp);
     return;
   }
@@ -122,6 +123,8 @@ void processos_remove(processo_t *lista, processo_t *atual){
   }
   temp->proximo = atual->proximo;
   free(atual->cpue);
+  tab_pag_destroi(temp->tab_pag);
+  t_printf("estou aqui");
   free(atual);
 }
 

@@ -1,5 +1,6 @@
 #include "mem.h"
 #include "tela.h"
+#include "instr.h"
 #include <stdlib.h>
 
 // tipo de dados opaco para representar uma região de memória
@@ -52,8 +53,8 @@ void mem_printa(mem_t *self){
   int i;
   int pc;
   t_printf("INICIO: %d", self->inicio_executando);
-  for (i = self->inicio_executando, pc = 0; i < self->fim_executando; i++, pc++){
-    t_printf("mem[%2d] = %4d - PC = %d", i, self->conteudo[i], pc);
+  for (i = 0/*self->inicio_executando*/, pc = 0; i < 35; i++, pc++){
+    t_printf("mem[%2d] = %4d - ins = %s", i, self->conteudo[i], instr_nome(self->conteudo[i]));
   }
   t_printf("INICIO: %d", self->inicio_executando);
   t_printf("FIM: %d", self->fim_executando);

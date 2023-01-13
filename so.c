@@ -64,7 +64,6 @@ so_t *so_cria(contr_t *contr)
   self->cpue = cpue_cria();
   self->memoria_utilizada = 0;
   init_mem(self); // Executa antes para saber qual o tamanho do programa principal
-  t_printf("Memoria utilizada: %d", self->memoria_utilizada);
   // Calcula o numero de paginas 
   int numero_de_paginas = self->memoria_utilizada / TAMANHO_PAGINA;
   if(self->memoria_utilizada % TAMANHO_PAGINA != 0){
@@ -90,6 +89,10 @@ so_t *so_cria(contr_t *contr)
   tab_pag_imprime(tab);
   mmu_t *mmu = contr_mmu(self->contr);
   mmu_usa_tab_pag(mmu, tab);
+
+  // Atualiza a memoria utilizada considerando os quadros utilizados
+  self->memoria_utilizada = numero_de_paginas * TAMANHO_QUADRO;
+  t_printf("Memoria utilizada: %d", self->memoria_utilizada);
 
   // historico
   self->historico = NULL;
@@ -447,6 +450,7 @@ static void so_trata_sisop_cria(so_t *self) {
     if(tamanho_memoria % TAMANHO_PAGINA != 0){
       numero_de_paginas++;
     }
+    t_printf("Tamanho programa: %d", tamanho_memoria);
 
     //mem_printa(mem);
     self->processos = processos_insere(self->processos, numeroPrograma, EXECUCAO, self->memoria_utilizada, fim, self->cpue, rel_agora(contr_rel(self->contr)), QUANTUM, TAMANHO_PAGINA, numero_de_paginas);
@@ -459,10 +463,6 @@ static void so_trata_sisop_cria(so_t *self) {
 
     // Pega o quadro inicial
     int quadro_inicial = self->memoria_utilizada / TAMANHO_PAGINA;
-    if(self->memoria_utilizada % TAMANHO_PAGINA != 0){
-      quadro_inicial++;
-    }
-    quadro_inicial++;
 
     // Preenche a tabela de páginas
     t_printf("Quadro inicial: %d", quadro_inicial);
@@ -477,7 +477,8 @@ static void so_trata_sisop_cria(so_t *self) {
     tab_pag_imprime(tab);
     mmu_usa_tab_pag(mmu, tab);
     
-    self->memoria_utilizada += tamanho_memoria;
+    // Mudança do utilizado considerando a quantidade de quadros
+    self->memoria_utilizada += numero_de_paginas * TAMANHO_PAGINA;
     t_printf("Memoria utilizada: %d\n", self->memoria_utilizada);
     mem_muda_utilizado(mem, self->memoria_utilizada);
   }else{
@@ -517,6 +518,8 @@ static void so_trata_sisop_cria(so_t *self) {
       break;
     }
   }
+
+  //mem_printa(mem);
 
   // Libera a memoria
   free(valores);
@@ -609,16 +612,22 @@ void escalonador(so_t *self){
   if(processos_pega_quantum(pronto) == 0){
     processos_set_quantum(pronto, QUANTUM);
   }
+
+  // Pega a mmu
+  mmu_t *mmu = contr_mmu(self->contr);
   
+  // Atualiza a tabela de paginas da mmu
+  tab_pag_t *tab = processos_tabela_de_pag(pronto);
+  mmu_usa_tab_pag(mmu, tab);
+
 
   // Altera a cpu em execução
   exec_altera_estado(contr_exec(self->contr), self->cpue);
 
-  mem_t *mem = contr_mem(self->contr);
   // Posição inicial da memoria
-  int inicio = processos_pega_inicio(pronto);
+  //int inicio = processos_pega_inicio(pronto);
   // Posição final da memoria
-  int fim = processos_pega_fim(pronto);
+  //int fim = processos_pega_fim(pronto);
 
   // t_printf("ini %d, fim %d", inicio, fim);
   
@@ -697,8 +706,10 @@ void so_contabiliza_instrucoes(so_t *self){
 void funcao_teste(so_t * self){
   t_ins(7, 1);
   t_ins(7, 2);
-  t_ins(0, 80);
-  t_ins(1, 60);
+  //t_ins(0, 80);
+  t_ins(0, 1);
+  //t_ins(1, 60);
+  t_ins(1, 1);
 }
 
 // Função utilizada para limpar os terminais

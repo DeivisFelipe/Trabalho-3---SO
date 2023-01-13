@@ -53,7 +53,7 @@ err_t tab_pag_traduz(tab_pag_t *self, int end_v, int *end_f)
   int deslocamento = end_v % self->tam_pag;
   int quadro = self->tab[pagina].quadro;
   *end_f = quadro * self->tam_pag + deslocamento;
-  t_printf("quadro: %d, deslocamento: %d, end_f: %d, tamanha pagina: %d", quadro, deslocamento, *end_f, self->tam_pag);
+  //t_printf("quadro: %d, deslocamento: %d, end_f: %d, tamanha pagina: %d", quadro, deslocamento, *end_f, self->tam_pag);
   return ERR_OK;
 }
 
