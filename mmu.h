@@ -78,7 +78,7 @@ void mmu_insere_quadro_livre_novo(mmu_t *self, int id, int endereco_principal_in
 void mmu_insere_quadro_ocupado(mmu_t *self, quadro_t *quadro);
 
 // Insere um quadro livre
-void mmu_insere_quadro_livre(mmu_t *self, quadro_t *quadro);
+void mmu_insere_quadro_livre(mmu_t *self, quadro_t *quadro, tab_pag_t *tab_pag, int pagina);
 
 // Inicializa os quadros livres
 void mmu_inicia_quadros_livres(mmu_t *self, int tamanho_quadro);
