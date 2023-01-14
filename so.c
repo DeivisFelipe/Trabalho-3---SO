@@ -613,7 +613,27 @@ static void so_trata_falha_pagina(so_t *self){
   // Pega o ultimo endereço que deu o erro
   int ultimo_endereco = mmu_ultimo_endereco(mmu);
   t_printf("Ultimo endereço: %d\n", ultimo_endereco);
-  
+
+  // Pega a tabela de paginas do processo que está em execução
+  processo_t *execucao = processos_pega_execucao(self->processos);
+  tab_pag_t *tab = processos_tabela_de_pag(execucao);
+
+  // Pega a pagina que deu o erro
+  int pagina = ultimo_endereco / TAMANHO_PAGINA;
+  t_printf("Pagina: %d\n", pagina); 
+
+  // Verifica se tem um quadro livre
+  quadro_t *quadro = mmu_retira_quadro_livre(mmu);
+  if(quadro == NULL){
+    t_printf("Não tem quadro livre\n");
+  }else{
+    t_printf("Quadro livre: %d\n", quadro->id);
+    // Insere o quadro ao quadros ocupados
+    mmu_insere_quadro_ocupado(mmu, quadro, tab, pagina);
+    // Deixa a pagina valida
+    tab_pag_muda_valida(tab, pagina, 1);
+    //
+  }
 }
 
 // Escalonador de processos
