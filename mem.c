@@ -24,7 +24,13 @@ mem_t *mem_cria(int tam, int tipo) {
     if (self->conteudo == NULL) {
       free(self);
       self = NULL;
-    }
+    }else{
+      // Inizializa a memoria com 0
+      int i;
+      for(i = 0; i < tam; i++){
+        self->conteudo[i] = 0;
+      }
+    }	
   }
   return self;
 }
