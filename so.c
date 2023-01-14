@@ -231,10 +231,14 @@ static void so_trata_sisop_escr(so_t *self)
 // chamada de sistema para término do processo
 static void so_trata_sisop_fim(so_t *self)
 {
+  // Pega a mmu
+  mmu_t *mmu = contr_mmu(self->contr);
+
   // pega o numero do programa
   int num_prog = cpue_A(self->cpue);
   // se o valor do programa for 0, termina o SO
   if (num_prog == 0) {
+    mmu_imprime_quadros_ocupados(mmu);
     // termina o SO
     so_termina(self);
     return;
@@ -260,13 +264,18 @@ static void so_trata_sisop_fim(so_t *self)
   // Remove o quadros utilizados
   tab_pag_t *tab = processos_tabela_de_pag(atual);
   int numero_de_paginas = tab_pag_num_pag(tab);
-  mmu_t *mmu = contr_mmu(self->contr);
+  
 
   // Preenche a tabela de páginas
   for(int i = 0; i < numero_de_paginas; i++){
     int idQuadro = tab_pag_pega_quadro(tab, i);
-    int quadro = mmu_pega_quadro_por_id(mmu, idQuadro);
+    quadro_t *quadro = mmu_remove_quadro_ocupado(mmu, idQuadro);
+    if(quadro != NULL){
+      mmu_insere_quadro_livre(mmu, quadro);
+    }
   }
+
+  mmu_imprime_quadros_ocupados(mmu);
 
   historico_t *temp = self->historico;
   if(self->historico == NULL){
@@ -289,10 +298,7 @@ static void so_trata_sisop_fim(so_t *self)
     t_ins(7, 0);
   }
 
-  
-
   // Deixa a mmu sem tabela de páginas
-  mmu_t *mmu = contr_mmu(self->contr);
   mmu_usa_tab_pag(mmu, NULL);
 
   escalonador(self);
@@ -539,6 +545,23 @@ static void so_trata_sisop_cria(so_t *self) {
     // Muda a tabela de paginas da MMU
     tab_pag_t *tab = processos_tabela_de_pag(processo);
     mmu_usa_tab_pag(mmu, tab);
+
+    // Remove o quadros utilizados
+    int numero_de_paginas = tab_pag_num_pag(tab);
+    mmu_t *mmu = contr_mmu(self->contr);
+
+    // Preenche a tabela de páginas
+    for(int i = 0; i < numero_de_paginas; i++){
+      int idQuadro = tab_pag_pega_quadro(tab, i);
+      quadro_t *quadro = mmu_remove_quadro_ocupado(mmu, idQuadro);
+      if(quadro != NULL){
+        mmu_insere_quadro_livre(mmu, quadro);
+      }
+      // Invalida a pagina
+      tab_pag_muda_valida(tab, i, false);
+    }
+
+    mmu_imprime_quadros_ocupados(mmu);
 
     // não vai mais ser usado no t3
     // Muda as posições da memoria para o SO e para a memoria

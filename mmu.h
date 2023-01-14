@@ -89,7 +89,7 @@ void mmu_imprime_memoria_quadro(mmu_t *self, quadro_t *quadro);
 // Retorna o id do quadro
 int mmu_pega_id_quadro(quadro_t *quadro);
 
-// Retorna o quadro pelo id
-quadro_t *mmu_pega_quadro_por_id(mmu_t *self, int idQuadro);
+// Remove o quadro dos ocupados pelo id
+quadro_t *mmu_remove_quadro_ocupado(mmu_t *self, int idQuadro);
 
 #endif // MMU_H

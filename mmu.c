@@ -22,7 +22,7 @@ struct quadro_t {
   // Referencia sobre a tabela de páginas
   tab_pag_t *tab_pag;
   int pagina;
-  quadro_t *proxmo;
+  quadro_t *proximo;
 };
 
 
@@ -46,21 +46,21 @@ void mmu_insere_quadro_livre_novo(mmu_t *self, int id, int endereco_principal_in
   quadro->endereco_principal_fim = endereco_principal_fim;
   quadro->endereco_secundario_inicio = 0;
   quadro->endereco_secundario_fim = 0;
-  quadro->proxmo = self->quadros_livres;
+  quadro->proximo = self->quadros_livres;
   quadro->tab_pag = NULL;
   quadro->pagina = -1;
   self->quadros_livres = quadro;
 }
 
 void mmu_insere_quadro_livre(mmu_t *self, quadro_t *quadro) {
-  quadro->proxmo = self->quadros_livres;
+  quadro->proximo = self->quadros_livres;
   quadro->tab_pag = NULL;
   quadro->pagina = -1;
   self->quadros_livres = quadro;
 }
 
 void mmu_insere_quadro_ocupado(mmu_t *self, quadro_t *quadro, tab_pag_t *tab_pag, int pagina, int endereco_secundario_inicio, int endereco_secundario_fim) {
-  quadro->proxmo = self->quadros_ocupados;
+  quadro->proximo = self->quadros_ocupados;
   quadro->tab_pag = tab_pag;
   quadro->pagina = pagina;
   quadro->endereco_secundario_inicio = endereco_secundario_inicio;
@@ -82,7 +82,7 @@ void mmu_imprime_quadros_livres(mmu_t *self) {
   quadro_t *quadro = self->quadros_livres;
   while (quadro != NULL) {
     t_printf("Quadro L %.4d: principal= %.4d - %.4d # secundaria= %.4d - %.4d", quadro->id, quadro->endereco_principal_inicio, quadro->endereco_principal_fim, quadro->endereco_secundario_inicio, quadro->endereco_secundario_fim);
-    quadro = quadro->proxmo;
+    quadro = quadro->proximo;
   }
 }
 
@@ -90,7 +90,7 @@ void mmu_imprime_quadros_ocupados(mmu_t *self) {
   quadro_t *quadro = self->quadros_ocupados;
   while (quadro != NULL) {
     t_printf("Quadro O %.4d: principal= %.4d - %.4d # secundaria= %.4d - %.4d", quadro->id, quadro->endereco_principal_inicio, quadro->endereco_principal_fim, quadro->endereco_secundario_inicio, quadro->endereco_secundario_fim);
-    quadro = quadro->proxmo;
+    quadro = quadro->proximo;
   }
 }
 
@@ -110,13 +110,13 @@ void mmu_imprime_memoria_quadro(mmu_t *self, quadro_t *quadro) {
 
 quadro_t *mmu_retira_quadro_livre(mmu_t *self) {
   quadro_t *quadro = self->quadros_livres;
-  self->quadros_livres = quadro->proxmo;
+  self->quadros_livres = quadro->proximo;
   return quadro;
 }
 
 quadro_t *mmu_retira_quadro_ocupado(mmu_t *self) {
   quadro_t *quadro = self->quadros_ocupados;
-  self->quadros_ocupados = quadro->proxmo;
+  self->quadros_ocupados = quadro->proximo;
   return quadro;
 }
 
@@ -125,12 +125,12 @@ void mmu_destroi(mmu_t *self)
   if (self != NULL) {
     for(quadro_t *quadro = self->quadros_livres; quadro != NULL; ) {
       quadro_t *aux = quadro;
-      quadro = quadro->proxmo;
+      quadro = quadro->proximo;
       free(aux);
     }
     for(quadro_t *quadro = self->quadros_ocupados; quadro != NULL; ) {
       quadro_t *aux = quadro;
-      quadro = quadro->proxmo;
+      quadro = quadro->proximo;
       free(aux);
     }
     free(self);
@@ -183,13 +183,21 @@ int mmu_pega_id_quadro(quadro_t *quadro){
   return quadro->id;
 }
 
-quadro_t *mmu_pega_quadro_por_id(mmu_t *self, int idQuadro){
+// Remove o quadro dos ocupados pelo id
+quadro_t *mmu_remove_quadro_ocupado(mmu_t *self, int idQuadro){
   quadro_t *quadro = self->quadros_ocupados;
+  quadro_t *quadro_anterior = NULL;
   while (quadro != NULL) {
     if(quadro->id == idQuadro){
+      if(quadro_anterior == NULL){
+        self->quadros_ocupados = quadro->proximo;
+      }else{
+        quadro_anterior->proximo = quadro->proximo;
+      }
       return quadro;
     }
-    quadro = quadro->proxmo;
+    quadro_anterior = quadro;
+    quadro = quadro->proximo;
   }
   return NULL;
 }
