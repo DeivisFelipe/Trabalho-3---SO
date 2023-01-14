@@ -124,8 +124,13 @@ void mmu_destroi(mmu_t *self)
 {
   if (self != NULL) {
     for(quadro_t *quadro = self->quadros_livres; quadro != NULL; ) {
-      quadro = quadro->proxmo;
       quadro_t *aux = quadro;
+      quadro = quadro->proxmo;
+      free(aux);
+    }
+    for(quadro_t *quadro = self->quadros_ocupados; quadro != NULL; ) {
+      quadro_t *aux = quadro;
+      quadro = quadro->proxmo;
       free(aux);
     }
     free(self);

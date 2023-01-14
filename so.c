@@ -296,7 +296,7 @@ static void so_termina(so_t *self)
   processos_destroi(self->processos);
   self->processos = NULL;
 
-  exibe_informacoes_teste(self);
+  // exibe_informacoes_teste(self);
 
   // destroi historico
   historico_t *historico = self->historico;
@@ -607,7 +607,7 @@ static void so_trata_falha_pagina(so_t *self){
 
   // Pega o ultimo endereço que deu o erro
   int ultimo_endereco = mmu_ultimo_endereco(mmu);
-  //t_printf("Ultimo endereço: %d\n", ultimo_endereco);
+  t_printf("Ultimo endereço: %d\n", ultimo_endereco);
 
   // Pega a tabela de paginas do processo que está em execução
   processo_t *processo_execucao = processos_pega_execucao(self->processos);
@@ -658,7 +658,9 @@ static void so_trata_falha_pagina(so_t *self){
     }
 
     // Imrpime a memoria principal do quadro
-    //mmu_imprime_memoria_quadro(mmu, quadro);
+    // mmu_imprime_memoria_quadro(mmu, quadro);
+
+    // mem_printa(contr_mem(self->contr, 1), NULL);
 
     // pega a cpue
     // cpue_imprime(self->cpue);
@@ -725,15 +727,16 @@ void escalonador(so_t *self){
   exec_altera_estado(contr_exec(self->contr), self->cpue);
 
   // Posição inicial da memoria
-  //int inicio = processos_pega_inicio(pronto);
+  int inicio = processos_pega_inicio(pronto);
   // Posição final da memoria
-  //int fim = processos_pega_fim(pronto);
+  int fim = processos_pega_fim(pronto);
   
   // Muda as posições da memoria para o SO e para a memoria
-  // self->memoria_pos = inicio;
-  // self->memoria_pos_fim = fim;
-  // mem_muda_inicio_executando(mem, self->memoria_pos);
-  // mem_muda_fim_executando(mem, self->memoria_pos_fim);
+  mem_t *mem_secundaria = contr_mem(self->contr, 1);
+  self->memoria_pos = inicio;
+  self->memoria_pos_fim = fim;
+  mem_muda_inicio_executando(mem_secundaria, self->memoria_pos);
+  mem_muda_fim_executando(mem_secundaria, self->memoria_pos_fim);
 }
 
 // houve uma interrupção do tipo err — trate-a

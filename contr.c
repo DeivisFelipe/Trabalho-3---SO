@@ -119,8 +119,6 @@ void contr_laco(contr_t *self)
     t_atualiza();
     contr_atualiza_estado(self);
     err_t err;
-    // printa o PC atual
-    t_printf("PC: %d\n", cpue_PC(exec_pega_estado(self->exec)));
     err = exec_executa_1(self->exec);
     if (err != ERR_OK) {
       //t_printf("iteracao: %i code", iteracao);
@@ -159,9 +157,11 @@ static void str_estado(char *txt, exec_t *exec, mmu_t *mmu, so_t *so)
   if (instr_num_args(opcode) > 0) {
     char aux[40];
     int A1;
-    mmu_le(mmu, pc+1, &A1);
-    sprintf(aux, " %d", A1);
-    strcat(txt, aux);
+    err_t erro = mmu_le(mmu, pc+1, &A1);
+    if (erro == ERR_OK) {
+      sprintf(aux, " %d", A1);
+      strcat(txt, aux);
+    }
   }
   // imprime estado de erro da CPU, se for o caso
   err_t err = cpue_erro(estado);
