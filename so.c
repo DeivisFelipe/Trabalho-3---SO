@@ -269,8 +269,8 @@ static void so_trata_sisop_fim(so_t *self)
 
   processos_remove(self->processos, atual);
   self->numero_de_processos--;
-  t_printf("Número de processos: %i", self->numero_de_processos);
-  processos_imprime(self->processos);
+  //t_printf("Número de processos: %i", self->numero_de_processos);
+  //processos_imprime(self->processos);
 
   // Finaliza o programa para o teste de tempo de execução
   if(self->numero_de_processos == 1){
@@ -607,7 +607,7 @@ static void so_trata_falha_pagina(so_t *self){
 
   // Pega o ultimo endereço que deu o erro
   int ultimo_endereco = mmu_ultimo_endereco(mmu);
-  t_printf("Ultimo endereço: %d\n", ultimo_endereco);
+  // t_printf("Ultimo endereço: %d\n", ultimo_endereco);
 
   // Pega a tabela de paginas do processo que está em execução
   processo_t *processo_execucao = processos_pega_execucao(self->processos);
