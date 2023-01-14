@@ -52,17 +52,17 @@ void mmu_insere_quadro_livre_novo(mmu_t *self, int id, int endereco_principal_in
   self->quadros_livres = quadro;
 }
 
-void mmu_insere_quadro_livre(mmu_t *self, quadro_t *quadro, tab_pag_t *tab_pag, int pagina) {
+void mmu_insere_quadro_livre(mmu_t *self, quadro_t *quadro) {
   quadro->proxmo = self->quadros_livres;
-  quadro->tab_pag = tab_pag;
-  quadro->pagina = pagina;
+  quadro->tab_pag = NULL;
+  quadro->pagina = -1;
   self->quadros_livres = quadro;
 }
 
-void mmu_insere_quadro_ocupado(mmu_t *self, quadro_t *quadro) {
+void mmu_insere_quadro_ocupado(mmu_t *self, quadro_t *quadro, tab_pag_t *tab_pag, int pagina) {
   quadro->proxmo = self->quadros_ocupados;
-  quadro->tab_pag = NULL;
-  quadro->pagina = -1;
+  quadro->tab_pag = tab_pag;
+  quadro->pagina = pagina;
   self->quadros_ocupados = quadro;
 }
 
