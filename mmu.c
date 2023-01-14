@@ -39,13 +39,13 @@ mmu_t *mmu_cria(mem_t *mem)
   return self;
 }
 
-void mmu_insere_quadro_livre_novo(mmu_t *self, int id, int endereco_principal_inicio, int endereco_principal_fim, int endereco_secundario_inicio, int endereco_secundario_fim) {
+void mmu_insere_quadro_livre_novo(mmu_t *self, int id, int endereco_principal_inicio, int endereco_principal_fim) {
   quadro_t *quadro = malloc(sizeof(*quadro));
   quadro->id = id;
   quadro->endereco_principal_inicio = endereco_principal_inicio;
   quadro->endereco_principal_fim = endereco_principal_fim;
-  quadro->endereco_secundario_inicio = endereco_secundario_inicio;
-  quadro->endereco_secundario_fim = endereco_secundario_fim;
+  quadro->endereco_secundario_inicio = 0;
+  quadro->endereco_secundario_fim = 0;
   quadro->proxmo = self->quadros_livres;
   quadro->tab_pag = NULL;
   quadro->pagina = -1;
@@ -72,14 +72,14 @@ void mmu_inicia_quadros_livres(mmu_t *self, int tamanho_quadro) {
   int numero_quadros = tamanha_memoria / tamanho_quadro;
   int i;
   for (i = 0; i < numero_quadros; i++) {
-    mmu_insere_quadro_livre_novo(self, i, i * tamanho_quadro, (i + 1) * tamanho_quadro - 1, i * tamanho_quadro, (i + 1) * tamanho_quadro - 1);
+    mmu_insere_quadro_livre_novo(self, i, i * tamanho_quadro, (i + 1) * tamanho_quadro - 1);
   }
 }
 
 void mmu_imprime_quadros_livres(mmu_t *self) {
   quadro_t *quadro = self->quadros_livres;
   while (quadro != NULL) {
-    t_printf("Quadro %d: %d - %d\n", quadro->id, quadro->endereco_principal_inicio, quadro->endereco_principal_fim);
+    t_printf("Quadro L %.4d: principal= %.4d - %.4d # secundaria= %.4d - %.4d", quadro->id, quadro->endereco_principal_inicio, quadro->endereco_principal_fim, quadro->endereco_secundario_inicio, quadro->endereco_secundario_fim);
     quadro = quadro->proxmo;
   }
 }
@@ -87,7 +87,7 @@ void mmu_imprime_quadros_livres(mmu_t *self) {
 void mmu_imprime_quadros_ocupados(mmu_t *self) {
   quadro_t *quadro = self->quadros_ocupados;
   while (quadro != NULL) {
-    t_printf("Quadro %d: %d - %d\n", quadro->id, quadro->endereco_principal_inicio, quadro->endereco_principal_fim);
+    t_printf("Quadro O %.4d: principal= %.4d - %.4d # secundaria= %.4d - %.4d", quadro->id, quadro->endereco_principal_inicio, quadro->endereco_principal_fim, quadro->endereco_secundario_inicio, quadro->endereco_secundario_fim);
     quadro = quadro->proxmo;
   }
 }
@@ -161,4 +161,8 @@ err_t mmu_escreve(mmu_t *self, int endereco, int valor)
 int mmu_ultimo_endereco(mmu_t *self)
 {
   return self->ultimo_endereco;
+}
+
+int mmu_pega_id_quadro(quadro_t *quadro){
+  return quadro->id;
 }

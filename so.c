@@ -627,11 +627,13 @@ static void so_trata_falha_pagina(so_t *self){
   if(quadro == NULL){
     t_printf("Não tem quadro livre\n");
   }else{
-    t_printf("Quadro livre: %d\n", quadro->id);
+    t_printf("Quadro livre: %d\n", mmu_pega_id_quadro(quadro));
     // Insere o quadro ao quadros ocupados
     mmu_insere_quadro_ocupado(mmu, quadro, tab, pagina);
     // Deixa a pagina valida
     tab_pag_muda_valida(tab, pagina, 1);
+
+    mmu_imprime_quadros_ocupados(mmu);
     //
   }
 }
