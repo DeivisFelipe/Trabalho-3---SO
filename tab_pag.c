@@ -41,6 +41,11 @@ void tab_pag_destroi(tab_pag_t *self)
   }
 }
 
+int tab_pag_pega_quadro(tab_pag_t *self, int pag)
+{
+  return self->tab[pag].quadro;
+}
+
 err_t tab_pag_traduz(tab_pag_t *self, int end_v, int *end_f)
 {
   int pagina = end_v / self->tam_pag;

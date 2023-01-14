@@ -182,3 +182,14 @@ int mmu_ultimo_endereco(mmu_t *self)
 int mmu_pega_id_quadro(quadro_t *quadro){
   return quadro->id;
 }
+
+quadro_t *mmu_pega_quadro_por_id(mmu_t *self, int idQuadro){
+  quadro_t *quadro = self->quadros_ocupados;
+  while (quadro != NULL) {
+    if(quadro->id == idQuadro){
+      return quadro;
+    }
+    quadro = quadro->proxmo;
+  }
+  return NULL;
+}

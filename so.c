@@ -257,6 +257,17 @@ static void so_trata_sisop_fim(so_t *self)
   item_historico->proximo = NULL;
   item_historico->id = id;
 
+  // Remove o quadros utilizados
+  tab_pag_t *tab = processos_tabela_de_pag(atual);
+  int numero_de_paginas = tab_pag_num_pag(tab);
+  mmu_t *mmu = contr_mmu(self->contr);
+
+  // Preenche a tabela de páginas
+  for(int i = 0; i < numero_de_paginas; i++){
+    int idQuadro = tab_pag_pega_quadro(tab, i);
+    int quadro = mmu_pega_quadro_por_id(mmu, idQuadro);
+  }
+
   historico_t *temp = self->historico;
   if(self->historico == NULL){
     self->historico = item_historico;

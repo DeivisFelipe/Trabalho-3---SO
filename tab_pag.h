@@ -16,6 +16,9 @@ typedef struct tab_pag_t tab_pag_t;
 // retorna NULL em caso de erro
 tab_pag_t *tab_pag_cria(int num_pag, int tam_pag);
 
+// Retorna o id do quadro que contém a página
+int tab_pag_pega_quadro(tab_pag_t *self, int pag);
+
 // destrói um tabela de páginas
 // nenhuma outra operação pode ser realizada na tabela após esta chamada
 void tab_pag_destroi(tab_pag_t *self);
