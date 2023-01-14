@@ -123,6 +123,9 @@ err_t mem_le(mem_t *self, int endereco, int *pvalor)
   } else {
     // mem_secundaria
     endereco = self->inicio_executando + endereco;
+    //t_printf("iniciando: %d", self->inicio_executando);
+    //t_printf("endereco: %d", endereco);
+    //t_printf("inicio + endereco: %d", self->inicio_executando + endereco);
   }
   err_t err = verif_permissao(self, endereco);
   if (err == ERR_OK) {

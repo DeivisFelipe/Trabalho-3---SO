@@ -146,7 +146,7 @@ static void so_trata_sisop_le(so_t *self)
   if(!pronto){
     processo_t *atual = processos_pega_execucao(self->processos);
     processos_atualiza_estado_processo(atual, BLOQUEADO, leitura, disp);
-    salvaMemoriaSecundaria(self, atual);
+    // salvaMemoriaSecundaria(self, atual); // Não salva mais na memória secundária
     if(processos_pega_id(atual) == 0){
       cpue_muda_modo(self->cpue, zumbi);
       cpue_muda_modo(processos_pega_cpue(atual), zumbi);
@@ -192,7 +192,7 @@ static void so_trata_sisop_escr(so_t *self)
   if(!pronto){
     processo_t *atual = processos_pega_execucao(self->processos);
     processos_atualiza_estado_processo(atual, BLOQUEADO, escrita, disp);
-    salvaMemoriaSecundaria(self, atual);
+    // salvaMemoriaSecundaria(self, atual); // Não salva mais na memória secundária
     if(processos_pega_id(atual) == 0){
       cpue_muda_modo(self->cpue, zumbi);
       cpue_muda_modo(processos_pega_cpue(atual), zumbi);
@@ -477,6 +477,8 @@ static void so_trata_sisop_cria(so_t *self) {
       numero_de_paginas++;
     }
 
+    //t_printf("Numero de paginas: %d 1", numero_de_paginas);
+
     //mem_printa(mem);
     self->processos = processos_insere(self->processos, numeroPrograma, EXECUCAO, self->memoria_utilizada, fim, self->cpue, rel_agora(contr_rel(self->contr)), QUANTUM, TAMANHO_PAGINA, numero_de_paginas);
 
@@ -487,12 +489,13 @@ static void so_trata_sisop_cria(so_t *self) {
     tab_pag_t *tab = processos_tabela_de_pag(processo);
 
     // Pega o quadro inicial
-    int quadro_inicial = self->memoria_utilizada / TAMANHO_PAGINA;
+    // int quadro_inicial = self->memoria_utilizada / TAMANHO_PAGINA;
+
+    //t_printf("Numero de paginas: %d 2", numero_de_paginas);
 
     // Preenche a tabela de páginas
     for(int i = 0; i < numero_de_paginas; i++){
-      tab_pag_muda_quadro(tab, i, quadro_inicial + i);
-      tab_pag_muda_valida(tab, i, true);
+      tab_pag_muda_valida(tab, i, false);
       tab_pag_muda_acessada(tab, i, false);
       tab_pag_muda_alterada(tab, i, false);
     }
@@ -502,7 +505,7 @@ static void so_trata_sisop_cria(so_t *self) {
     
     // Mudança do utilizado considerando a quantidade de quadros
     self->memoria_utilizada += numero_de_paginas * TAMANHO_PAGINA;
-    //t_printf("Memoria utilizada: %d\n", self->memoria_utilizada);
+    t_printf("Memoria utilizada: %d\n", self->memoria_utilizada);
     mem_muda_utilizado(mem, self->memoria_utilizada);
     mem_muda_utilizado(memSecundaria, self->memoria_utilizada);
   }else{
@@ -536,11 +539,12 @@ static void so_trata_sisop_cria(so_t *self) {
 
   // Insere o código do novo programa na memoria principal
   for (int i = 0; i < tamanho_memoria; i++) {
-    if (mmu_escreve(mmu, i, valores[i]) != ERR_OK) {
+    /*if (mmu_escreve(mmu, i, valores[i]) != ERR_OK) {
       t_printf("so.init_mem: erro de memoria principal, endereco %d\n", i);
       panico(self);
       break;
-    }
+    }*/
+    // Escreve só na memoria secundaria agora
     // Insere o código do novo programa na memoria secundaria
     if (mem_escreve(memSecundaria, i, valores[i]) != ERR_OK) {
       t_printf("so.init_mem: erro de memoria secundaria, endereco %d\n", i);
@@ -607,7 +611,7 @@ static void so_trata_falha_pagina(so_t *self){
 
   // Pega o ultimo endereço que deu o erro
   int ultimo_endereco = mmu_ultimo_endereco(mmu);
-  // t_printf("Ultimo endereço: %d\n", ultimo_endereco);
+  t_printf("Ultimo endereço: %d\n", ultimo_endereco);
 
   // Pega a tabela de paginas do processo que está em execução
   processo_t *processo_execucao = processos_pega_execucao(self->processos);
@@ -625,7 +629,7 @@ static void so_trata_falha_pagina(so_t *self){
     //t_printf("Quadro livre: %d\n", mmu_pega_id_quadro(quadro));
 
     // Pega o inicio e o fim da memoria secundaria e da memoria principal
-    int inicio_secundaria = processos_pega_inicio(processo_execucao) + (pagina * TAMANHO_PAGINA);
+    int inicio_secundaria = (pagina * TAMANHO_PAGINA);
     int fim_secundaria = inicio_secundaria + TAMANHO_PAGINA;
     int inicio_principal = ultimo_endereco - (ultimo_endereco % TAMANHO_PAGINA);
     //int fim_principal = inicio_principal + TAMANHO_PAGINA;
@@ -638,7 +642,7 @@ static void so_trata_falha_pagina(so_t *self){
 
     // processos_imprime(self->processos);
 
-    // tab_pag_imprime(tab);
+    tab_pag_imprime(tab);
 
     // mmu_imprime_quadros_ocupados(mmu);
 
@@ -653,14 +657,14 @@ static void so_trata_falha_pagina(so_t *self){
       if(erro != ERR_OK){
         t_printf("Erro ao ler da memoria secundaria\n");
       }
-      // t_printf("Valor: %d\n", valor);
+      //t_printf("Valor: %d\n", valor);
       mmu_escreve(mmu, principal, valor);
     }
 
     // Imrpime a memoria principal do quadro
-    // mmu_imprime_memoria_quadro(mmu, quadro);
+    mmu_imprime_memoria_quadro(mmu, quadro);
 
-    // mem_printa(contr_mem(self->contr, 1), NULL);
+    //mem_printa(contr_mem(self->contr, 1), NULL);
 
     // pega a cpue
     // cpue_imprime(self->cpue);

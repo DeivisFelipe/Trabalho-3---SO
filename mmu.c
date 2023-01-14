@@ -100,11 +100,11 @@ void mmu_imprime_quadros(mmu_t *self) {
 }
 
 void mmu_imprime_memoria_quadro(mmu_t *self, quadro_t *quadro) {
-  t_printf("Memoria do quadro: %.4d", quadro->id);
+  t_printf("Memoria do quadro: %d", quadro->id);
   for(int i = quadro->endereco_principal_inicio; i <= quadro->endereco_principal_fim; i++) {
     int valor;
     mem_le(self->mem, i, &valor);
-    t_printf("Memoria: %.4d = %.4d", i, valor);
+    t_printf("Memoria: %.4d = %d", i, valor);
   }
 }
 
