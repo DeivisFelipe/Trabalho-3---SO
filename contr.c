@@ -119,6 +119,8 @@ void contr_laco(contr_t *self)
     t_atualiza();
     contr_atualiza_estado(self);
     err_t err;
+    // printa o PC atual
+    t_printf("PC: %d\n", cpue_PC(exec_pega_estado(self->exec)));
     err = exec_executa_1(self->exec);
     if (err != ERR_OK) {
       //t_printf("iteracao: %i code", iteracao);

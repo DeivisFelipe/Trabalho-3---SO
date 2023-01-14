@@ -103,11 +103,6 @@ so_t *so_cria(contr_t *contr)
   // Chama a função teste que será usado para fazer analise do tempo de execucao
   funcao_teste(self);
   // coloca a CPU em modo usuário
-  /*
-  exec_copia_estado(contr_exec(self->contr), self->cpue);
-  cpue_muda_modo(self->cpue, usuario);
-  exec_altera_estado(contr_exec(self->contr), self->cpue);
-  */
   return self;
 }
 
@@ -554,7 +549,7 @@ static void so_trata_sisop_cria(so_t *self) {
     }
   }
 
-  mem_printa(memSecundaria, NULL);
+  //mem_printa(memSecundaria, NULL);
 
   // Libera a memoria
   free(valores);
@@ -569,7 +564,6 @@ static void so_trata_sisop_cria(so_t *self) {
 static void so_trata_sisop(so_t *self)
 {
   // o tipo de chamada está no "complemento" do cpue
-  exec_copia_estado(contr_exec(self->contr), self->cpue);
   so_chamada_t chamada = cpue_complemento(self->cpue);
   switch (chamada) {
     case SO_LE:
@@ -613,7 +607,7 @@ static void so_trata_falha_pagina(so_t *self){
 
   // Pega o ultimo endereço que deu o erro
   int ultimo_endereco = mmu_ultimo_endereco(mmu);
-  t_printf("Ultimo endereço: %d\n", ultimo_endereco);
+  //t_printf("Ultimo endereço: %d\n", ultimo_endereco);
 
   // Pega a tabela de paginas do processo que está em execução
   processo_t *processo_execucao = processos_pega_execucao(self->processos);
@@ -621,20 +615,20 @@ static void so_trata_falha_pagina(so_t *self){
 
   // Pega a pagina que deu o erro
   int pagina = ultimo_endereco / TAMANHO_PAGINA;
-  t_printf("Pagina: %d\n", pagina); 
+  //t_printf("Pagina: %d\n", pagina); 
 
   // Verifica se tem um quadro livre
   quadro_t *quadro = mmu_retira_quadro_livre(mmu);
   if(quadro == NULL){
     t_printf("Não tem quadro livre\n");
   }else{
-    t_printf("Quadro livre: %d\n", mmu_pega_id_quadro(quadro));
+    //t_printf("Quadro livre: %d\n", mmu_pega_id_quadro(quadro));
 
     // Pega o inicio e o fim da memoria secundaria e da memoria principal
     int inicio_secundaria = processos_pega_inicio(processo_execucao) + (pagina * TAMANHO_PAGINA);
     int fim_secundaria = inicio_secundaria + TAMANHO_PAGINA;
     int inicio_principal = ultimo_endereco - (ultimo_endereco % TAMANHO_PAGINA);
-    int fim_principal = inicio_principal + TAMANHO_PAGINA;
+    //int fim_principal = inicio_principal + TAMANHO_PAGINA;
 
     // Insere o quadro ao quadros ocupados
     mmu_insere_quadro_ocupado(mmu, quadro, tab, pagina, inicio_secundaria, fim_secundaria);
@@ -642,33 +636,34 @@ static void so_trata_falha_pagina(so_t *self){
     tab_pag_muda_valida(tab, pagina, 1);
     tab_pag_muda_quadro(tab, pagina, mmu_pega_id_quadro(quadro));
 
-    processos_imprime(self->processos);
+    // processos_imprime(self->processos);
 
-    tab_pag_imprime(tab);
+    // tab_pag_imprime(tab);
 
-    mmu_imprime_quadros_ocupados(mmu);
+    // mmu_imprime_quadros_ocupados(mmu);
 
     // Copia os valores da memoria secundaria para a memoria principal do quadro
-    t_printf("Inicio secundaria: %d\n", inicio_secundaria);
-    t_printf("Fim secundaria: %d\n", fim_secundaria);
-    t_printf("Inicio principal: %d\n", inicio_principal);
-    t_printf("Fim principal: %d\n", fim_principal);
+    //t_printf("Inicio secundaria: %d\n", inicio_secundaria);
+    //t_printf("Fim secundaria: %d\n", fim_secundaria);
+    //t_printf("Inicio principal: %d\n", inicio_principal);
+    //t_printf("Fim principal: %d\n", fim_principal);
     for(int secundaria = inicio_secundaria, principal = inicio_principal; secundaria < fim_secundaria; secundaria++, principal++){
       int valor;
       err_t erro = mem_le(contr_mem(self->contr, 1), secundaria,&valor);
       if(erro != ERR_OK){
         t_printf("Erro ao ler da memoria secundaria\n");
       }
-      t_printf("Valor: %d\n", valor);
+      // t_printf("Valor: %d\n", valor);
       mmu_escreve(mmu, principal, valor);
     }
 
     // Imrpime a memoria principal do quadro
-    mmu_imprime_memoria_quadro(mmu, quadro);
+    //mmu_imprime_memoria_quadro(mmu, quadro);
 
     // pega a cpue
-    cpue_imprime(self->cpue);
-    cpue_imprime(exec_pega_estado(contr_exec(self->contr)));
+    // cpue_imprime(self->cpue);
+    // cpue_imprime(exec_pega_estado(contr_exec(self->contr)));
+    cpue_muda_erro(self->cpue, 0, 0);
     exec_altera_estado(contr_exec(self->contr), self->cpue);
 
   }
@@ -745,6 +740,7 @@ void escalonador(so_t *self){
 void so_int(so_t *self, err_t err)
 {
   processo_t *execucao;
+  exec_copia_estado(contr_exec(self->contr), self->cpue);
   switch (err) {
     case ERR_SISOP:
       execucao = processos_pega_execucao(self->processos);
