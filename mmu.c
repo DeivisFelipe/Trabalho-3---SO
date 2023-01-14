@@ -36,7 +36,7 @@ mmu_t *mmu_cria(mem_t *mem)
   return self;
 }
 
-void mmu_insere_quadro_livre(mmu_t *self, int id, int endereco_principal_inicio, int endereco_principal_fim, int endereco_secundario_inicio, int endereco_secundario_fim) {
+void mmu_insere_quadro_livre_novo(mmu_t *self, int id, int endereco_principal_inicio, int endereco_principal_fim, int endereco_secundario_inicio, int endereco_secundario_fim) {
   quadro_t *quadro = malloc(sizeof(*quadro));
   quadro->id = id;
   quadro->endereco_principal_inicio = endereco_principal_inicio;
@@ -47,23 +47,23 @@ void mmu_insere_quadro_livre(mmu_t *self, int id, int endereco_principal_inicio,
   self->quadros_livres = quadro;
 }
 
-void mmu_insere_quadro_ocupado(mmu_t *self, int id, int endereco_principal_inicio, int endereco_principal_fim, int endereco_secundario_inicio, int endereco_secundario_fim) {
-  quadro_t *quadro = malloc(sizeof(*quadro));
-  quadro->id = id;
-  quadro->endereco_principal_inicio = endereco_principal_inicio;
-  quadro->endereco_principal_fim = endereco_principal_fim;
-  quadro->endereco_secundario_inicio = endereco_secundario_inicio;
-  quadro->endereco_secundario_fim = endereco_secundario_fim;
+void mmu_insere_quadro_livre(mmu_t *self, quadro_t *quadro) {
+  quadro->proxmo = self->quadros_livres;
+  self->quadros_livres = quadro;
+}
+
+void mmu_insere_quadro_ocupado(mmu_t *self, quadro_t *quadro) {
   quadro->proxmo = self->quadros_ocupados;
   self->quadros_ocupados = quadro;
 }
+
 
 void mmu_inicia_quadros_livres(mmu_t *self, int tamanho_quadro) {
   int tamanha_memoria = mem_tam(self->mem);
   int numero_quadros = tamanha_memoria / tamanho_quadro;
   int i;
   for (i = 0; i < numero_quadros; i++) {
-    mmu_insere_quadro_livre(self, i, i * tamanho_quadro, (i + 1) * tamanho_quadro - 1, i * tamanho_quadro, (i + 1) * tamanho_quadro - 1);
+    mmu_insere_quadro_livre_novo(self, i, i * tamanho_quadro, (i + 1) * tamanho_quadro - 1, i * tamanho_quadro, (i + 1) * tamanho_quadro - 1);
   }
 }
 

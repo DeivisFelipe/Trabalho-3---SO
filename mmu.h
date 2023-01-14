@@ -71,13 +71,16 @@ void mmu_imprime_quadros_ocupados(mmu_t *self);
 // Imprime todos os quadros
 void mmu_imprime_quadros(mmu_t *self);
 
-// cria um quadro livre
-void mmu_insere_quadro_livre(mmu_t *self, int id, int endereco_principal_inicio, int endereco_principal_fim, int endereco_secundario_inicio, int endereco_secundario_fim);
+// Cria um quadro livre novo
+void mmu_insere_quadro_livre_novo(mmu_t *self, int id, int endereco_principal_inicio, int endereco_principal_fim, int endereco_secundario_inicio, int endereco_secundario_fim);
 
-// cria um quadro ocupado
-void mmu_insere_quadro_ocupado(mmu_t *self, int id, int endereco_principal_inicio, int endereco_principal_fim, int endereco_secundario_inicio, int endereco_secundario_fim);
+// Insere um quadro ocupado
+void mmu_insere_quadro_ocupado(mmu_t *self, quadro_t *quadro);
 
-// inicializa os quadros livres
+// Insere um quadro livre
+void mmu_insere_quadro_livre(mmu_t *self, quadro_t *quadro);
+
+// Inicializa os quadros livres
 void mmu_inicia_quadros_livres(mmu_t *self, int tamanho_quadro);
 
 #endif // MMU_H

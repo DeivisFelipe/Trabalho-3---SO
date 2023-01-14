@@ -606,6 +606,16 @@ static void so_trata_tic(so_t *self)
   }
 }
 
+static void so_trata_falha_pagina(so_t *self){
+  // Pega a mmu
+  mmu_t *mmu = contr_mmu(self->contr);
+
+  // Pega o ultimo endereço que deu o erro
+  int ultimo_endereco = mmu_ultimo_endereco(mmu);
+  t_printf("Ultimo endereço: %d\n", ultimo_endereco);
+  
+}
+
 // Escalonador de processos
 void escalonador(so_t *self){
 
@@ -695,6 +705,7 @@ void so_int(so_t *self, err_t err)
       t_printf("SO: ERR_PAGINV pagina invalida\n");
       break;
     case ERR_FALPAG:
+      so_trata_falha_pagina(self);
       t_printf("SO: ERR_FALPAG Tabela diz que a página é inválida\n");
       break;
     default:
@@ -796,6 +807,10 @@ void exibe_informacoes_teste(so_t *self){
 // carrega um programa na memória
 static void init_mem(so_t *self)
 {
+
+  // ### Não esta mais salvando o programa na memoria principal, somente na secundaria ###
+
+
   // programa para executar na nossa CPU
   int progr[] = {
   #include "initso.maq"
@@ -805,13 +820,13 @@ static void init_mem(so_t *self)
   t_printf("Processo: SO executando\n");
 
   // inicializa a memória com o programa com uma memoria nova
-  mem_t *mem = contr_mem(self->contr, 0);
+  //mem_t *mem = contr_mem(self->contr, 0);
   mem_t *memSecundaria = contr_mem(self->contr, 1);
 
   // Memoria principal
-  mem_muda_utilizado(mem, self->memoria_utilizada);
+  /*mem_muda_utilizado(mem, self->memoria_utilizada);
   mem_muda_inicio_executando(mem, 0);
-  mem_muda_fim_executando(mem, tamanho_programa);
+  mem_muda_fim_executando(mem, tamanho_programa);*/
 
   // Memoria secundaria
   mem_muda_utilizado(memSecundaria, self->memoria_utilizada);
@@ -820,11 +835,12 @@ static void init_mem(so_t *self)
 
   //t_printf("Memoria Utilizada: %d\n", mem_utilizado(mem));
   for (int i = 0; i < tamanho_programa; i++) {
+    
     // escreve na memória principal
-    if (mem_escreve(mem, i, progr[i]) != ERR_OK) {
+    /*if (mem_escreve(mem, i, progr[i]) != ERR_OK) {
       t_printf("so.init_mem: erro de memoria, endereco %d\n", i);
       panico(self);
-    }
+    }*/
     // escreve na memoria secundaria
     if(mem_escreve(memSecundaria, i, progr[i]) != ERR_OK){
       t_printf("so.init_mem: erro de memoria, endereco %d\n", i);
@@ -832,7 +848,7 @@ static void init_mem(so_t *self)
     }
   }
   self->memoria_utilizada += tamanho_programa;
-  mem_muda_utilizado(mem, self->memoria_utilizada);
+  // mem_muda_utilizado(mem, self->memoria_utilizada);
   mem_muda_utilizado(memSecundaria, self->memoria_utilizada);
   mem_printa(memSecundaria, NULL);
   //t_printf("Memoria Utilizada: %d\n", mem_utilizado(mem));
