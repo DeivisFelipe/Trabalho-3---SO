@@ -69,7 +69,7 @@ so_t *so_cria(contr_t *contr)
   if(self->memoria_utilizada % TAMANHO_PAGINA != 0){
     numero_de_paginas++;
   }
-  t_printf("Numero de paginas: %d", numero_de_paginas);
+  //t_printf("Numero de paginas: %d", numero_de_paginas);
   self->processos = processos_cria(0, EXECUCAO, contr_mem(self->contr, 0), 0, self->memoria_utilizada, self->cpue, rel_agora(contr_rel(self->contr)), TAMANHO_PAGINA, numero_de_paginas);
   processos_set_quantum(self->processos, QUANTUM);
   self->numero_de_processos = 1;
@@ -79,17 +79,18 @@ so_t *so_cria(contr_t *contr)
   self->tempo_parado = 0;
   self->chamadas_de_sistema = 0;
   self->chamadas_de_sistema_relogio = 0;
+
   tab_pag_t *tab = processos_tabela_de_pag(self->processos);
   for(int i = 0; i < numero_de_paginas; i++){
-    tab_pag_muda_quadro(tab, i, i);
     tab_pag_muda_valida(tab, i, false);
     tab_pag_muda_acessada(tab, i, false);
     tab_pag_muda_alterada(tab, i, false);
   }
+  tab_pag_imprime(tab);
   mmu_t *mmu = contr_mmu(self->contr);
   mmu_inicia_quadros_livres(mmu, TAMANHO_QUADRO);
-  mmu_imprime_quadros_livres(mmu);
-  mmu_imprime_quadros_ocupados(mmu);
+  //mmu_imprime_quadros_livres(mmu);
+  //mmu_imprime_quadros_ocupados(mmu);
   mmu_usa_tab_pag(mmu, tab);
 
   // Atualiza a memoria utilizada considerando os quadros utilizados
@@ -615,8 +616,8 @@ static void so_trata_falha_pagina(so_t *self){
   t_printf("Ultimo endereço: %d\n", ultimo_endereco);
 
   // Pega a tabela de paginas do processo que está em execução
-  processo_t *execucao = processos_pega_execucao(self->processos);
-  tab_pag_t *tab = processos_tabela_de_pag(execucao);
+  processo_t *processo_execucao = processos_pega_execucao(self->processos);
+  tab_pag_t *tab = processos_tabela_de_pag(processo_execucao);
 
   // Pega a pagina que deu o erro
   int pagina = ultimo_endereco / TAMANHO_PAGINA;
@@ -628,13 +629,48 @@ static void so_trata_falha_pagina(so_t *self){
     t_printf("Não tem quadro livre\n");
   }else{
     t_printf("Quadro livre: %d\n", mmu_pega_id_quadro(quadro));
+
+    // Pega o inicio e o fim da memoria secundaria e da memoria principal
+    int inicio_secundaria = processos_pega_inicio(processo_execucao) + (pagina * TAMANHO_PAGINA);
+    int fim_secundaria = inicio_secundaria + TAMANHO_PAGINA;
+    int inicio_principal = ultimo_endereco - (ultimo_endereco % TAMANHO_PAGINA);
+    int fim_principal = inicio_principal + TAMANHO_PAGINA;
+
     // Insere o quadro ao quadros ocupados
-    mmu_insere_quadro_ocupado(mmu, quadro, tab, pagina);
+    mmu_insere_quadro_ocupado(mmu, quadro, tab, pagina, inicio_secundaria, fim_secundaria);
     // Deixa a pagina valida
     tab_pag_muda_valida(tab, pagina, 1);
+    tab_pag_muda_quadro(tab, pagina, mmu_pega_id_quadro(quadro));
+
+    processos_imprime(self->processos);
+
+    tab_pag_imprime(tab);
 
     mmu_imprime_quadros_ocupados(mmu);
-    //
+
+    // Copia os valores da memoria secundaria para a memoria principal do quadro
+    t_printf("Inicio secundaria: %d\n", inicio_secundaria);
+    t_printf("Fim secundaria: %d\n", fim_secundaria);
+    t_printf("Inicio principal: %d\n", inicio_principal);
+    t_printf("Fim principal: %d\n", fim_principal);
+    for(int secundaria = inicio_secundaria, principal = inicio_principal; secundaria < fim_secundaria; secundaria++, principal++){
+      int valor;
+      err_t erro = mem_le(contr_mem(self->contr, 1), secundaria,&valor);
+      if(erro != ERR_OK){
+        t_printf("Erro ao ler da memoria secundaria\n");
+      }
+      t_printf("Valor: %d\n", valor);
+      mmu_escreve(mmu, principal, valor);
+    }
+
+    // Imrpime a memoria principal do quadro
+    mmu_imprime_memoria_quadro(mmu, quadro);
+
+    // pega a cpue
+    cpue_imprime(self->cpue);
+    cpue_imprime(exec_pega_estado(contr_exec(self->contr)));
+    exec_altera_estado(contr_exec(self->contr), self->cpue);
+
   }
 }
 
@@ -728,7 +764,7 @@ void so_int(so_t *self, err_t err)
       break;
     case ERR_FALPAG:
       so_trata_falha_pagina(self);
-      t_printf("SO: ERR_FALPAG Tabela diz que a página é inválida\n");
+      //t_printf("SO: ERR_FALPAG Tabela diz que a página é inválida\n");
       break;
     default:
       t_printf("SO: interrupcao nao tratada [%s]", err_nome(err));
@@ -872,7 +908,7 @@ static void init_mem(so_t *self)
   self->memoria_utilizada += tamanho_programa;
   // mem_muda_utilizado(mem, self->memoria_utilizada);
   mem_muda_utilizado(memSecundaria, self->memoria_utilizada);
-  mem_printa(memSecundaria, NULL);
+  //mem_printa(memSecundaria, NULL);
   //t_printf("Memoria Utilizada: %d\n", mem_utilizado(mem));
 }
   

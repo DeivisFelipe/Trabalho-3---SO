@@ -59,10 +59,12 @@ void mmu_insere_quadro_livre(mmu_t *self, quadro_t *quadro) {
   self->quadros_livres = quadro;
 }
 
-void mmu_insere_quadro_ocupado(mmu_t *self, quadro_t *quadro, tab_pag_t *tab_pag, int pagina) {
+void mmu_insere_quadro_ocupado(mmu_t *self, quadro_t *quadro, tab_pag_t *tab_pag, int pagina, int endereco_secundario_inicio, int endereco_secundario_fim) {
   quadro->proxmo = self->quadros_ocupados;
   quadro->tab_pag = tab_pag;
   quadro->pagina = pagina;
+  quadro->endereco_secundario_inicio = endereco_secundario_inicio;
+  quadro->endereco_secundario_fim = endereco_secundario_fim;
   self->quadros_ocupados = quadro;
 }
 
@@ -95,6 +97,15 @@ void mmu_imprime_quadros_ocupados(mmu_t *self) {
 void mmu_imprime_quadros(mmu_t *self) {
   mmu_imprime_quadros_livres(self);
   mmu_imprime_quadros_ocupados(self);
+}
+
+void mmu_imprime_memoria_quadro(mmu_t *self, quadro_t *quadro) {
+  t_printf("Memoria do quadro: %.4d", quadro->id);
+  for(int i = quadro->endereco_principal_inicio; i <= quadro->endereco_principal_fim; i++) {
+    int valor;
+    mem_le(self->mem, i, &valor);
+    t_printf("Memoria: %.4d = %.4d", i, valor);
+  }
 }
 
 quadro_t *mmu_retira_quadro_livre(mmu_t *self) {

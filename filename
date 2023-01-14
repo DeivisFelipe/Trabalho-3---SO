@@ -1,6 +1,6 @@
-==81== Memcheck, a memory error detector
-==81== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
-==81== Using Valgrind-3.15.0 and LibVEX; rerun with -h for copyright info
-==81== Command: ./teste
-==81== Parent PID: 10
-==81== 
+==345== Memcheck, a memory error detector
+==345== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==345== Using Valgrind-3.15.0 and LibVEX; rerun with -h for copyright info
+==345== Command: ./teste
+==345== Parent PID: 10
+==345== 

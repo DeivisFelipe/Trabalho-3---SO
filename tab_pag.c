@@ -87,10 +87,8 @@ bool tab_pag_alterada(tab_pag_t *self, int pag)
 }
 
 void tab_pag_imprime(tab_pag_t *self){
-  t_printf("Tabela de Páginas");
+  t_printf("Tabela de Páginas\t Numero de páginas: %d", self->num_pag);
   t_printf("Página\tValida\tQuadro\tAcessada\tAlterada");
-  t_printf("numero %d", self->num_pag);
-  t_atualiza();
   for(int i = 0; i < self->num_pag; i++){
     //t_printf("%d", i);
     //t_atualiza();
