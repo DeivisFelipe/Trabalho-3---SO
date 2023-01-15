@@ -707,7 +707,7 @@ static void so_trata_falha_pagina(so_t *self){
   int inicio_secundaria = (pagina * TAMANHO_PAGINA);
   int fim_secundaria = inicio_secundaria + TAMANHO_PAGINA;
   int inicio_principal = ultimo_endereco - (ultimo_endereco % TAMANHO_PAGINA);
-  int fim_principal = inicio_principal + TAMANHO_PAGINA;
+  //int fim_principal = inicio_principal + TAMANHO_PAGINA;
   // Inicio e secundaria real
   int inicio_secundaria_real = inicio_secundaria + processos_pega_inicio(processo_execucao);
   int fim_secundaria_real = fim_secundaria + processos_pega_inicio(processo_execucao);
@@ -727,10 +727,10 @@ static void so_trata_falha_pagina(so_t *self){
   //mmu_imprime_quadros(mmu);
 
   // Copia os valores da memoria secundaria para a memoria principal do quadro
-  t_printf("Inicio secundaria: %d\n", inicio_secundaria);
-  t_printf("Fim secundaria: %d\n", fim_secundaria);
-  t_printf("Inicio principal: %d\n", inicio_principal);
-  t_printf("Fim principal: %d\n", fim_principal);
+  //t_printf("Inicio secundaria: %d\n", inicio_secundaria);
+  //t_printf("Fim secundaria: %d\n", fim_secundaria);
+  //t_printf("Inicio principal: %d\n", inicio_principal);
+  //t_printf("Fim principal: %d\n", fim_principal);
   
   for(int secundaria = inicio_secundaria, principal = inicio_principal; secundaria < fim_secundaria; secundaria++, principal++){
     int valor;
