@@ -11,6 +11,10 @@ struct mmu_t {
   // Controle de quadros
   quadro_t *quadros_livres;
   quadro_t *quadros_ocupados;
+  // Tipo de escalonador
+  int tipo_escalonador;
+  // Tamanho do quadro
+  int tamanho_quadro;
 };
 
 struct quadro_t {
@@ -37,6 +41,14 @@ mmu_t *mmu_cria(mem_t *mem)
     self->quadros_livres = NULL;
   }
   return self;
+}
+
+void mmu_seta_tipo_escalonador(mmu_t *self, int tipo_escalonador){
+  self->tipo_escalonador = tipo_escalonador;
+}
+
+void mmu_seta_tamanho_quadro(mmu_t *self, int tamanho_quadro){
+  self->tamanho_quadro = tamanho_quadro;
 }
 
 void mmu_insere_quadro_livre_novo(mmu_t *self, int id, int endereco_principal_inicio, int endereco_principal_fim) {
@@ -135,8 +147,8 @@ quadro_t *mmu_retira_quadro_livre(mmu_t *self) {
   return quadro;
 }
 
-quadro_t *mmu_retira_quadro_ocupado(mmu_t *self, int tipo) {
-  if(tipo == 1){
+quadro_t *mmu_retira_quadro_ocupado(mmu_t *self) {
+  if(self->tipo_escalonador == 1 || self->tipo_escalonador == 2){
     quadro_t *quadro = self->quadros_ocupados;
     if(quadro == NULL) {
       return NULL;
@@ -199,6 +211,15 @@ err_t mmu_le(mmu_t *self, int endereco, int *pvalor)
   if (err != ERR_OK) {
     return err;
   }
+
+  if(self->tipo_escalonador == 2){
+    int id_quadro = end_fis / self->tamanho_quadro;
+    quadro_t *quadro = mmu_retorna_quadro(self, id_quadro);
+    if(quadro != NULL){
+      mmu_coloca_quadro(self, quadro);
+    }
+  }
+  
   return mem_le(self->mem, end_fis, pvalor);
 }
 
@@ -209,6 +230,15 @@ err_t mmu_escreve(mmu_t *self, int endereco, int valor)
   if (err != ERR_OK) {
     return err;
   }
+
+  if(self->tipo_escalonador == 2){
+    int id_quadro = end_fis / self->tamanho_quadro;
+    quadro_t *quadro = mmu_retorna_quadro(self, id_quadro);
+    if(quadro != NULL){
+      mmu_coloca_quadro(self, quadro);
+    }
+  }
+
   return mem_escreve(self->mem, end_fis, valor, false);
 }
 
@@ -219,6 +249,36 @@ int mmu_ultimo_endereco(mmu_t *self)
 
 int mmu_pega_id_quadro(quadro_t *quadro){
   return quadro->id;
+}
+
+// Pega o quadro, tira ele da possição atual e coloca na frente da lista
+void mmu_coloca_quadro(mmu_t *self, quadro_t *quadro){
+  // Tira o quadro da possição atual e bota na frente da lista
+  quadro_t *aux = self->quadros_ocupados;
+  if(aux == quadro){
+    return;
+  } else {
+    while (aux->proximo != quadro)
+    {
+      aux = aux->proximo;
+    }
+    aux->proximo = quadro->proximo;
+    aux = self->quadros_ocupados;
+    quadro->proximo = aux;
+    self->quadros_ocupados = quadro;
+  }
+}
+
+// Retorna o quadro com o id passado
+quadro_t *mmu_retorna_quadro(mmu_t *self, int idQuadro){
+  quadro_t *quadro = self->quadros_ocupados;
+  while (quadro != NULL) {
+    if(quadro->id == idQuadro){
+      return quadro;
+    }
+    quadro = quadro->proximo;
+  }
+  return NULL;
 }
 
 // Remove o quadro dos ocupados pelo id

@@ -25,6 +25,19 @@ typedef struct quadro_t quadro_t;
 // retorna NULL em caso de erro
 mmu_t *mmu_cria(mem_t *mem);
 
+// Seta o tipo de escalonador
+void mmu_seta_tipo_escalonador(mmu_t *self, int tipo_escalonador);
+
+// Seta o tamanho quadro
+void mmu_seta_tamanho_quadro(mmu_t *self, int tamanho_quadro);
+
+
+// Pega o quadro, tira ele da possição atual e coloca na frente da lista
+void mmu_coloca_quadro(mmu_t *self, quadro_t *quadro);
+
+// Retorna o quadro com o id passado
+quadro_t *mmu_retorna_quadro(mmu_t *self, int idQuadro);
+
 // destrói um gerenciador de memória
 // nenhuma outra operação pode ser realizada no gerenciador após
 //   esta chamada
@@ -60,7 +73,7 @@ int mmu_ultimo_endereco(mmu_t *self);
 quadro_t *mmu_retira_quadro_livre(mmu_t *self);
 
 // Pega um guardo ocupado
-quadro_t *mmu_retira_quadro_ocupado(mmu_t *self, int tipo);
+quadro_t *mmu_retira_quadro_ocupado(mmu_t *self);
 
 // Imprime os quadros livres
 void mmu_imprime_quadros_livres(mmu_t *self);

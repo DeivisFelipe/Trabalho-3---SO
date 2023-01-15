@@ -12,7 +12,7 @@
 #define TIPO_ESCALONADOR 2
 #define TAMANHO_QUADRO 5
 #define TAMANHO_PAGINA 5
-#define TIPO_ESCALONADOR_MEMORIA 1
+#define TIPO_ESCALONADOR_MEMORIA 2 // 1 = FIFO, 2 = LRU
 
 struct historico_t{
   int id;
@@ -87,6 +87,8 @@ so_t *so_cria(contr_t *contr)
     tab_pag_muda_alterada(tab, i, false);
   }
   mmu_t *mmu = contr_mmu(self->contr);
+  mmu_seta_tipo_escalonador(mmu, TIPO_ESCALONADOR_MEMORIA);
+  mmu_seta_tamanho_quadro(mmu, TAMANHO_QUADRO);
   mmu_inicia_quadros_livres(mmu, TAMANHO_QUADRO);
   mmu_usa_tab_pag(mmu, tab);
 
@@ -628,15 +630,13 @@ static void so_trata_falha_pagina(so_t *self){
   quadro_t *quadro = mmu_retira_quadro_livre(mmu);
   if(quadro == NULL){
     // Pega o quadro que vai liberar
-    quadro = mmu_retira_quadro_ocupado(mmu, TIPO_ESCALONADOR_MEMORIA);
-    
+    quadro = mmu_retira_quadro_ocupado(mmu);
 
     if(quadro != NULL){
       // Salva a memoria do quadro na memoria secundaria
       mmu_salva_memoria_secundaria(mmu, quadro, contr_mem(self->contr, 1));
       // Insere o quadro na lista de quadros livres
       mmu_insere_quadro_livre(mmu, quadro);
-
       quadro = mmu_retira_quadro_livre(mmu);
     } else {
       t_printf("Não tem quadro ocupado\n");
