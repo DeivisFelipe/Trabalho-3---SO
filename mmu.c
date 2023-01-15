@@ -117,10 +117,6 @@ void mmu_salva_memoria_secundaria(mmu_t *mmu, quadro_t *quadro, mem_t *mem_secun
   for(int i = quadro->endereco_principal_inicio; i <= quadro->endereco_principal_fim; i++) {
     mem_le(mmu->mem, i, &valor);
     int posicao_secundaria = quadro->endereco_secundario_inicio + i - quadro->endereco_principal_inicio;
-    if(posicao_secundaria > 80){
-      t_printf("Salvando memoria: %.4d = %d #####", posicao_secundaria, valor);
-    }
-    //t_printf("Salvando memoria: %.4d = %d", posicao_secundaria, valor);
     mem_escreve(mem_secundaria, posicao_secundaria, valor, true);
   }
 
@@ -212,9 +208,6 @@ err_t mmu_escreve(mmu_t *self, int endereco, int valor)
   err_t err = traduz_endereco(self, endereco, &end_fis);
   if (err != ERR_OK) {
     return err;
-  }
-  if(end_fis > 80){
-    t_printf("3 Salvando memoria: %.4d = %d #####", end_fis, valor);
   }
   return mem_escreve(self->mem, end_fis, valor, false);
 }
