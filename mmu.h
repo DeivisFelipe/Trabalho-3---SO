@@ -60,10 +60,13 @@ int mmu_ultimo_endereco(mmu_t *self);
 quadro_t *mmu_retira_quadro_livre(mmu_t *self);
 
 // Pega um guardo ocupado
-quadro_t *mmu_retira_quadro_ocupado(mmu_t *self);
+quadro_t *mmu_retira_quadro_ocupado(mmu_t *self, int tipo);
 
 // Imprime os quadros livres
 void mmu_imprime_quadros_livres(mmu_t *self);
+
+// Salva da memoria principal para a secundaria
+void mmu_salva_memoria_secundaria(mmu_t *mmu, quadro_t *quadro, mem_t *mem_secundaria);
 
 // Imprime os quadros ocupados
 void mmu_imprime_quadros_ocupados(mmu_t *self);

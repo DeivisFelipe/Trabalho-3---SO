@@ -68,7 +68,7 @@ void mem_printa(mem_t *self, mem_t *compara){
     t_printf("INICIO: %d", self->inicio_executando);
     t_printf("MEMORIA SECUNDARIA");
     if(compara == NULL){
-      for (i = self->inicio_executando, pc = 0; i < self->fim_executando; i++, pc++){
+      for (i = self->inicio_executando, pc = 0; i < self->fim_executando - 10; i++, pc++){
         t_printf("mem[%2d] = %4d - ins = %s", i, self->conteudo[i], instr_nome(self->conteudo[i]));
       }
     }else{
@@ -134,14 +134,21 @@ err_t mem_le(mem_t *self, int endereco, int *pvalor)
   return err;
 }
 
-err_t mem_escreve(mem_t *self, int endereco, int valor)
+err_t mem_escreve(mem_t *self, int endereco, int valor, bool salva_quadro)
 {
   if(self->tipo == 0){
     endereco = endereco;
   } else {
     // mem_secundaria
-    endereco = self->inicio_executando + endereco;
+    if(salva_quadro){
+      endereco = endereco;
+    }else{
+      endereco = self->inicio_executando + endereco;
+    }
   }
+  if(endereco > 80){
+      t_printf("2 Salvando memoria: %.4d = %d #####", endereco, valor);
+    }
   err_t err = verif_permissao(self, endereco);
   if (err == ERR_OK) {
     self->conteudo[endereco] = valor;

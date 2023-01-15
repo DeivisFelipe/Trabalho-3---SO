@@ -56,6 +56,8 @@ void mmu_insere_quadro_livre(mmu_t *self, quadro_t *quadro) {
   quadro->proximo = self->quadros_livres;
   quadro->tab_pag = NULL;
   quadro->pagina = -1;
+  quadro->endereco_secundario_inicio = 0;
+  quadro->endereco_secundario_fim = 0;
   self->quadros_livres = quadro;
 }
 
@@ -108,16 +110,56 @@ void mmu_imprime_memoria_quadro(mmu_t *self, quadro_t *quadro) {
   }
 }
 
+void mmu_salva_memoria_secundaria(mmu_t *mmu, quadro_t *quadro, mem_t *mem_secundaria){
+  //t_printf("Inicio %d", quadro->endereco_principal_inicio);
+  //t_printf("Inicio Secundaria %d", quadro->endereco_secundario_inicio);
+  int valor;
+  for(int i = quadro->endereco_principal_inicio; i <= quadro->endereco_principal_fim; i++) {
+    mem_le(mmu->mem, i, &valor);
+    int posicao_secundaria = quadro->endereco_secundario_inicio + i - quadro->endereco_principal_inicio;
+    if(posicao_secundaria > 80){
+      t_printf("Salvando memoria: %.4d = %d #####", posicao_secundaria, valor);
+    }
+    //t_printf("Salvando memoria: %.4d = %d", posicao_secundaria, valor);
+    mem_escreve(mem_secundaria, posicao_secundaria, valor, true);
+  }
+
+  // Invalida pagina antiga
+  tab_pag_t *tab_pag = quadro->tab_pag;
+  int pagina = quadro->pagina;
+  tab_pag_muda_valida(tab_pag, pagina, 0);
+}
+
 quadro_t *mmu_retira_quadro_livre(mmu_t *self) {
   quadro_t *quadro = self->quadros_livres;
+  if(quadro == NULL) {
+    return NULL;
+  }
   self->quadros_livres = quadro->proximo;
   return quadro;
 }
 
-quadro_t *mmu_retira_quadro_ocupado(mmu_t *self) {
-  quadro_t *quadro = self->quadros_ocupados;
-  self->quadros_ocupados = quadro->proximo;
-  return quadro;
+quadro_t *mmu_retira_quadro_ocupado(mmu_t *self, int tipo) {
+  if(tipo == 1){
+    quadro_t *quadro = self->quadros_ocupados;
+    if(quadro == NULL) {
+      return NULL;
+    }
+    if(quadro->proximo == NULL){
+      self->quadros_ocupados = NULL;
+    }
+    while (quadro->proximo != NULL)
+    {
+      quadro_t *aux = quadro;
+      quadro = aux->proximo;
+      if(quadro->proximo == NULL){
+        aux->proximo = NULL;
+      }
+    }
+    t_printf("Quadro retirado: %d", quadro->id);
+    return quadro;
+  }
+  return NULL;
 }
 
 void mmu_destroi(mmu_t *self)
@@ -171,7 +213,10 @@ err_t mmu_escreve(mmu_t *self, int endereco, int valor)
   if (err != ERR_OK) {
     return err;
   }
-  return mem_escreve(self->mem, end_fis, valor);
+  if(end_fis > 80){
+    t_printf("3 Salvando memoria: %.4d = %d #####", end_fis, valor);
+  }
+  return mem_escreve(self->mem, end_fis, valor, false);
 }
 
 int mmu_ultimo_endereco(mmu_t *self)

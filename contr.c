@@ -37,7 +37,7 @@ contr_t *contr_cria(void)
   if (self == NULL) return NULL;
   // cria a memória e a MMU
   self->mem = mem_cria(MEM_TAM, 0);
-  self->memSecundaria = mem_cria(MEM_TAM, 1);
+  self->memSecundaria = mem_cria(MEM_TAM_SECUNDARIA, 1);
   self->mmu = mmu_cria(self->mem);
   // cria dispositivos de E/S (o relógio e um terminal)
   self->term = term_cria();
@@ -83,6 +83,8 @@ void contr_informa_so(contr_t *self, so_t *so) {
   self->so = so;
 }
 
+// tipo = 0 -> mem principal
+// tipo = 1 -> mem secundaria
 mem_t *contr_mem(contr_t *self, int tipo){
   if (tipo == 0) {
     return self->mem;

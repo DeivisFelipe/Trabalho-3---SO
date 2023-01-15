@@ -8,7 +8,8 @@
 // concentra os dispositivos de hardware
 
 
-#define MEM_TAM 2000        // tamanho da memória principal
+#define MEM_TAM 30        // tamanho da memória principal
+#define MEM_TAM_SECUNDARIA 2000        // tamanho da memória secundaria
 
 typedef struct contr_t contr_t;
 
