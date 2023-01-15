@@ -1,21 +1,6 @@
-==810== Memcheck, a memory error detector
-==810== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
-==810== Using Valgrind-3.15.0 and LibVEX; rerun with -h for copyright info
-==810== Command: ./teste
-==810== Parent PID: 10
-==810== 
-==810== 
-==810== HEAP SUMMARY:
-==810==     in use at exit: 229,778 bytes in 221 blocks
-==810==   total heap usage: 674 allocs, 453 frees, 274,078 bytes allocated
-==810== 
-==810== LEAK SUMMARY:
-==810==    definitely lost: 16 bytes in 1 blocks
-==810==    indirectly lost: 36 bytes in 1 blocks
-==810==      possibly lost: 0 bytes in 0 blocks
-==810==    still reachable: 229,726 bytes in 219 blocks
-==810==         suppressed: 0 bytes in 0 blocks
-==810== Rerun with --leak-check=full to see details of leaked memory
-==810== 
-==810== For lists of detected and suppressed errors, rerun with: -s
-==810== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+==831== Memcheck, a memory error detector
+==831== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==831== Using Valgrind-3.15.0 and LibVEX; rerun with -h for copyright info
+==831== Command: ./teste
+==831== Parent PID: 10
+==831== 

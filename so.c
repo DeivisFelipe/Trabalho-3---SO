@@ -70,7 +70,6 @@ so_t *so_cria(contr_t *contr)
   if(self->memoria_utilizada % TAMANHO_PAGINA != 0){
     numero_de_paginas++;
   }
-  //t_printf("Numero de paginas: %d", numero_de_paginas);
   self->processos = processos_cria(0, EXECUCAO, contr_mem(self->contr, 0), 0, self->memoria_utilizada, self->cpue, rel_agora(contr_rel(self->contr)), TAMANHO_PAGINA, numero_de_paginas);
   processos_set_quantum(self->processos, QUANTUM);
   self->numero_de_processos = 1;
@@ -87,11 +86,8 @@ so_t *so_cria(contr_t *contr)
     tab_pag_muda_acessada(tab, i, false);
     tab_pag_muda_alterada(tab, i, false);
   }
-  // tab_pag_imprime(tab);
   mmu_t *mmu = contr_mmu(self->contr);
   mmu_inicia_quadros_livres(mmu, TAMANHO_QUADRO);
-  //mmu_imprime_quadros_livres(mmu);
-  //mmu_imprime_quadros_ocupados(mmu);
   mmu_usa_tab_pag(mmu, tab);
 
   // Atualiza a memoria utilizada considerando os quadros utilizados
@@ -112,23 +108,6 @@ void so_destroi(so_t *self)
   cpue_destroi(self->cpue);
   free(self);
 }
-
-/*void salvaMemoriaSecundaria(so_t *self, processo_t *atual){
-  int fim =  self->memoria_pos_fim - self->memoria_pos;
-  int valor;
-  for(int i = 0; i < fim; i++){
-    err_t erro = mmu_le(contr_mmu(self->contr), i, &valor);
-    if(erro == ERR_OK){
-      err_t erro2 = mem_escreve(contr_mem(self->contr, 1), i, valor);
-      if(erro2 != ERR_OK){
-        t_printf("Erro ao escrever na memoria secundaria");
-      }
-    }else{
-      t_printf("Erro ao ler da memoria principal");
-    }
-  }
-  mem_printa(contr_mem(self->contr, 1), contr_mem(self->contr, 0));
-}*/
 
 // trata chamadas de sistema
 
@@ -239,7 +218,6 @@ static void so_trata_sisop_fim(so_t *self)
   int num_prog = cpue_A(self->cpue);
   // se o valor do programa for 0, termina o SO
   if (num_prog == 0) {
-    //mmu_imprime_quadros_ocupados(mmu);
     // termina o SO
     so_termina(self);
     return;
@@ -276,8 +254,6 @@ static void so_trata_sisop_fim(so_t *self)
     }
   }
 
-  // mmu_imprime_quadros_ocupados(mmu);
-
   historico_t *temp = self->historico;
   if(self->historico == NULL){
     self->historico = item_historico;
@@ -290,8 +266,6 @@ static void so_trata_sisop_fim(so_t *self)
 
   processos_remove(self->processos, atual);
   self->numero_de_processos--;
-  //t_printf("Número de processos: %i", self->numero_de_processos);
-  //processos_imprime(self->processos);
 
   // Finaliza o programa para o teste de tempo de execução
   if(self->numero_de_processos == 1){
@@ -497,8 +471,6 @@ static void so_trata_sisop_cria(so_t *self) {
       numero_de_paginas++;
     }
 
-    //t_printf("Numero de paginas: %d 1", numero_de_paginas);
-
     //mem_printa(mem);
     self->processos = processos_insere(self->processos, numeroPrograma, EXECUCAO, self->memoria_utilizada, fim, self->cpue, rel_agora(contr_rel(self->contr)), QUANTUM, TAMANHO_PAGINA, numero_de_paginas);
 
@@ -509,9 +481,6 @@ static void so_trata_sisop_cria(so_t *self) {
     tab_pag_t *tab = processos_tabela_de_pag(processo);
 
     // Pega o quadro inicial
-    // int quadro_inicial = self->memoria_utilizada / TAMANHO_PAGINA;
-
-    //t_printf("Numero de paginas: %d 2", numero_de_paginas);
 
     // Preenche a tabela de páginas
     for(int i = 0; i < numero_de_paginas; i++){
@@ -541,9 +510,6 @@ static void so_trata_sisop_cria(so_t *self) {
     int inicio = processos_pega_inicio(processo);
     // Posição final da memoria
     fim = processos_pega_fim(processo);
-    // printa a posição inicial e final da memoria
-    //t_printf("Posição inicial da memoria: %d\n", inicio);
-    //t_printf("Posição final da memoria: %d\n", fim);
 
     // Muda a tabela de paginas da MMU
     tab_pag_t *tab = processos_tabela_de_pag(processo);
@@ -552,7 +518,6 @@ static void so_trata_sisop_cria(so_t *self) {
 
     // Remove o quadros utilizados
     int numero_de_paginas = tab_pag_num_pag(tab);
-    //t_printf("Numero de paginas: %d\n", numero_de_paginas);
     mmu_t *mmu = contr_mmu(self->contr);
 
     // Preenche a tabela de páginas
@@ -568,12 +533,6 @@ static void so_trata_sisop_cria(so_t *self) {
       }
     }
 
-    //tab_pag_imprime(tab);
-
-    //t_printf("tamanho_memoria: %d\n", tamanho_memoria);
-
-    //mmu_imprime_quadros(mmu);
-
     // não vai mais ser usado no t3
     // Muda as posições da memoria para o SO e para a memoria
     self->memoria_pos = inicio;
@@ -585,11 +544,6 @@ static void so_trata_sisop_cria(so_t *self) {
 
   // Insere o código do novo programa na memoria principal
   for (int i = 0; i < tamanho_memoria; i++) {
-    /*if (mmu_escreve(mmu, i, valores[i]) != ERR_OK) {
-      t_printf("so.init_mem: erro de memoria principal, endereco %d\n", i);
-      panico(self);
-      break;
-    }*/
     // Escreve só na memoria secundaria agora
     // Insere o código do novo programa na memoria secundaria
     if (mem_escreve(memSecundaria, i, valores[i], false) != ERR_OK) {
@@ -602,10 +556,6 @@ static void so_trata_sisop_cria(so_t *self) {
   if(repete){
     mem_printa(memSecundaria, NULL);
   }
-
-  // mem_printa(memSecundaria, NULL);
-
-  //mem_printa(memSecundaria, NULL);
 
   // Libera a memoria
   free(valores);
@@ -677,23 +627,15 @@ static void so_trata_falha_pagina(so_t *self){
   // Verifica se tem um quadro livre
   quadro_t *quadro = mmu_retira_quadro_livre(mmu);
   if(quadro == NULL){
-    //t_printf("Não tem quadro livre\n");
-
-    //mmu_imprime_quadros(mmu);
-
     // Pega o quadro que vai liberar
     quadro = mmu_retira_quadro_ocupado(mmu, TIPO_ESCALONADOR_MEMORIA);
     
 
     if(quadro != NULL){
-      // Imprime a memoria do quadro
-      //mmu_imprime_memoria_quadro(mmu, quadro);
       // Salva a memoria do quadro na memoria secundaria
       mmu_salva_memoria_secundaria(mmu, quadro, contr_mem(self->contr, 1));
       // Insere o quadro na lista de quadros livres
       mmu_insere_quadro_livre(mmu, quadro);
-
-      // mmu_imprime_memoria_quadro(mmu, quadro);
 
       quadro = mmu_retira_quadro_livre(mmu);
     } else {
@@ -701,7 +643,6 @@ static void so_trata_falha_pagina(so_t *self){
       panico(self);
     }
   }
-  //t_printf("Quadro livre: %d\n", mmu_pega_id_quadro(quadro));
 
   // Pega o inicio e o fim da memoria secundaria e da memoria principal
   int inicio_secundaria = (pagina * TAMANHO_PAGINA);
@@ -711,26 +652,12 @@ static void so_trata_falha_pagina(so_t *self){
   // Inicio e secundaria real
   int inicio_secundaria_real = inicio_secundaria + processos_pega_inicio(processo_execucao);
   int fim_secundaria_real = fim_secundaria + processos_pega_inicio(processo_execucao);
-  // t_printf("Inicio secundaria Real: %d\n", inicio_secundaria_real);
-  // t_printf("Fim secundaria Real: %d", fim_secundaria_real);
 
   // Insere o quadro ao quadros ocupados
   mmu_insere_quadro_ocupado(mmu, quadro, tab, pagina, inicio_secundaria_real, fim_secundaria_real);
   // Deixa a pagina valida
   tab_pag_muda_valida(tab, pagina, 1);
   tab_pag_muda_quadro(tab, pagina, mmu_pega_id_quadro(quadro));
-
-  // processos_imprime(self->processos);
-  
-
-  // mmu_imprime_quadros_ocupados(mmu);
-  //mmu_imprime_quadros(mmu);
-
-  // Copia os valores da memoria secundaria para a memoria principal do quadro
-  //t_printf("Inicio secundaria: %d\n", inicio_secundaria);
-  //t_printf("Fim secundaria: %d\n", fim_secundaria);
-  //t_printf("Inicio principal: %d\n", inicio_principal);
-  //t_printf("Fim principal: %d\n", fim_principal);
   
   for(int secundaria = inicio_secundaria, principal = inicio_principal; secundaria < fim_secundaria; secundaria++, principal++){
     int valor;
@@ -738,24 +665,10 @@ static void so_trata_falha_pagina(so_t *self){
     if(erro != ERR_OK){
       t_printf("Erro ao ler da memoria secundaria\n");
     }
-    //t_printf("Valor: %d\n", valor);
     mmu_escreve(mmu, principal, valor);
   }
-  //mmu_imprime_quadros(mmu);
-  //tab_pag_imprime(tab);
-  //mmu_imprime_memoria_quadro(mmu, quadro);
-  
-  //t_printf("###############");
-  //tab_pag_imprime(processos_tabela_de_pag(self->processos));
-
-  // Imrpime a memoria principal do quadro
-  //mmu_imprime_memoria_quadro(mmu, quadro);
-
-  //mem_printa(contr_mem(self->contr, 1), NULL);
 
   // pega a cpue
-  // cpue_imprime(self->cpue);
-  // cpue_imprime(exec_pega_estado(contr_exec(self->contr)));
   cpue_muda_erro(self->cpue, 0, 0);
   exec_altera_estado(contr_exec(self->contr), self->cpue);
 }
@@ -856,10 +769,6 @@ void so_int(so_t *self, err_t err)
       break;
     default:
       t_printf("SO: interrupcao nao tratada [%s]", err_nome(err));
-      //mem_printa(contr_mem(self->contr, 0), NULL);
-      //mmu_t *mmu = contr_mmu(self->contr);
-      //tab_pag_imprime(processos_tabela_de_pag(processos_pega_execucao(self->processos)));
-      //mmu_imprime_quadros(mmu);
       self->paniquei = true;
   }
 }
@@ -973,11 +882,6 @@ static void init_mem(so_t *self)
   //mem_t *mem = contr_mem(self->contr, 0);
   mem_t *memSecundaria = contr_mem(self->contr, 1);
 
-  // Memoria principal
-  /*mem_muda_utilizado(mem, self->memoria_utilizada);
-  mem_muda_inicio_executando(mem, 0);
-  mem_muda_fim_executando(mem, tamanho_programa);*/
-
   // Memoria secundaria
   mem_muda_utilizado(memSecundaria, self->memoria_utilizada);
   mem_muda_inicio_executando(memSecundaria, 0);
@@ -985,12 +889,6 @@ static void init_mem(so_t *self)
 
   //t_printf("Memoria Utilizada: %d\n", mem_utilizado(mem));
   for (int i = 0; i < tamanho_programa; i++) {
-    
-    // escreve na memória principal
-    /*if (mem_escreve(mem, i, progr[i]) != ERR_OK) {
-      t_printf("so.init_mem: erro de memoria, endereco %d\n", i);
-      panico(self);
-    }*/
     // escreve na memoria secundaria
     if(mem_escreve(memSecundaria, i, progr[i], false) != ERR_OK){
       t_printf("so.init_mem: erro de memoria, endereco %d\n", i);
@@ -998,10 +896,7 @@ static void init_mem(so_t *self)
     }
   }
   self->memoria_utilizada += tamanho_programa;
-  // mem_muda_utilizado(mem, self->memoria_utilizada);
   mem_muda_utilizado(memSecundaria, self->memoria_utilizada);
-  //mem_printa(memSecundaria, NULL);
-  //t_printf("Memoria Utilizada: %d\n", mem_utilizado(mem));
 }
   
 static void panico(so_t *self) 
